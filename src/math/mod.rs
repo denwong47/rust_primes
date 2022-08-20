@@ -3,15 +3,21 @@
 #![allow(unused_variables)]
 
 
+/// Determines 
+/// Something
 pub fn is_prime(
     num:u64,
     primes:Option<&[u64]>,
 ) -> bool {
+
     // Optional Parameter
     let _primes_to_test:&[u64];
+
+    let _obj:&[u64] = &(2..30).collect::<Vec<u64>>();
+    
     match primes {
         Some(p) => _primes_to_test = p,
-        None => _primes_to_test = &[],
+        None => _primes_to_test = _obj,
     }
 
     for &_prime in _primes_to_test {
