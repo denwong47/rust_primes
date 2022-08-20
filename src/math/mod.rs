@@ -3,24 +3,30 @@
 #![allow(unused_variables)]
 
 
-/// Determines 
-/// Something
+/// Determines if a number is a prime number.
+/// This is a wrapper around `is_prime_with_known_primes`, which actually does the work.
+/// The difference is that `is_prime_with_known_primes` requires a list of all known primes to be passed to it, up to and including the `sqrt` of the number itself.
+/// `is_prime` will enquire that list using `list_primes` first, before calling `is_prime_with_known_primes`.
 pub fn is_prime(
     num:u64,
-    primes:Option<&[u64]>,
 ) -> bool {
 
-    // Optional Parameter
-    let _primes_to_test:&[u64];
-
-    let _obj:&[u64] = &(2..30).collect::<Vec<u64>>();
+    let _list_of_primes:Vec<u64> = list_primes(
+        (num as f64).sqrt() as u64, 
+    );
     
-    match primes {
-        Some(p) => _primes_to_test = p,
-        None => _primes_to_test = _obj,
-    }
+    return is_prime_with_known_primes(
+        num,
+        &_list_of_primes,
+    )
+}
 
-    for &_prime in _primes_to_test {
+fn is_prime_with_known_primes(
+    num:u64,
+    primes:&[u64],
+) -> bool {
+
+    for &_prime in primes {
         if num % _prime == 0 {
             return false;
         } else if (_prime as f64) >= (num as f64).sqrt() {
@@ -37,7 +43,7 @@ pub fn list_primes(
     let mut _list_of_primes:Vec<u64> = Vec::new();
 
     for _candidate in 2..num {
-        if is_prime(_candidate, Some(&_list_of_primes)) {
+        if is_prime_with_known_primes(_candidate, &_list_of_primes) {
             _list_of_primes.push(_candidate)
         }
     }
