@@ -34,6 +34,8 @@ fn is_prime_with_known_primes(
     primes:&[u64],
 ) -> bool {
 
+    // println!("Evaluating {} using {:?}...", num, primes);
+
     for &_prime in primes {
         if num % _prime == 0 {
             return false;
@@ -69,19 +71,17 @@ pub fn list_primes_threaded(
     num:u64,
 ) -> Vec<u64> {
     let mut _list_of_primes:Vec<u64>                = vec![2];
-    // let mut _list_of_primes:sync::Arc<Vec<u64>>     = sync::Arc::new(vec![2]);
 
     let mut _range_max:u64              = _list_of_primes[0];
-
-    // let mut _threads:Vec<thread::JoinHandle<()>> = Vec::with_capacity(MAX_WORKERS);
     
     while _range_max < num {
         let _range_min:u64 = _range_max +1;
         _range_max = cmp::min(num+1, _range_min*_range_min);
 
-        let mut _threads:Vec<thread::JoinHandle<Option<u64>>> = Vec::with_capacity((_range_max-_range_min+1) as usize);
+        let mut _threads:Vec<thread::JoinHandle<Option<u64>>> = Vec::with_capacity(MAX_WORKERS);
 
         {
+            let mut _list_of_primes_in_range:Vec<u64> = Vec::new();
             let _arc_of_primes:sync::Arc<Vec<u64>> = sync::Arc::new(_list_of_primes.clone());
             println!("Cloned {} items to an Arc.", _list_of_primes.len());
 
@@ -89,7 +89,7 @@ pub fn list_primes_threaded(
                 let _num_in_scope:u64 = _num;
                 let _list_of_primes_ref = sync::Arc::clone(&_arc_of_primes);
 
-                if _num % 1000 == 0{
+                if _num % 10000 == 0{
                     println!("Spawning thread for {}...", _num)
                 }
     
@@ -101,19 +101,38 @@ pub fn list_primes_threaded(
                             return None
                         }
                     })
-                )
+                );
+
+                while 
+                    _threads.len() >= MAX_WORKERS || 
+                    (
+                        _num>=_range_max-1 &&
+                        _threads.len()>0
+                    )
+                
+                {
+                    // Wait til the first thread is done first
+                    let _result:Option<u64> = _threads.pop().expect("No Threads left!").join().unwrap();
+                    match _result {
+                        Some(num) => _list_of_primes_in_range.push(num),
+                        None => (),
+                    }
+                }
             }
 
+            _list_of_primes.append(&mut _list_of_primes_in_range);
         }
 
         for _thread in _threads{
-            let _value:Option<u64> = _thread.join().unwrap();
+            let _result:Option<u64> = _thread.join().unwrap();
 
-            match _value {
+            match _result {
                 Some(num) => _list_of_primes.push(num),
                 None => (),
             }
         }
+
+        _list_of_primes.sort();
 
         println!("{} primes found up to {}.", _list_of_primes.len().to_formatted_string(&Locale::en), _range_max.to_formatted_string(&Locale::en))
     }
@@ -126,5 +145,5 @@ pub fn list_primes_threaded(
 pub fn list_primes(
     num:u64,
 ) -> Vec<u64> {
-    return list_primes_unthreaded(num);
+    return list_primes_threaded(num);
 }
