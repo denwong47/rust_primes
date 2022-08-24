@@ -23,7 +23,7 @@ use num_format::{Locale, ToFormattedString};
 // Maximum number of concurrent threads.
 // This is important because Rust implements system threads, not green threads.
 // So if we spawn more threads than we are supposed to, we overwhelm the OS Scheduler and we slow down.
-const MAX_WORKERS:   usize = 12;
+const MAX_WORKERS:   usize = 10;
 const MIN_CHUNKSIZE: usize = 10000;
 
 /// Determines if a number is a prime number.

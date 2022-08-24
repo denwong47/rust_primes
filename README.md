@@ -8,7 +8,12 @@
 
 #### ...Some idiot managed to make `Rust` slower than `Python`.
 
-![This guy sucks](https://i.kym-cdn.com/entries/icons/mobile/000/000/554/picard-facepalm.jpg)
+<!-- ![This guy sucks](https://i.kym-cdn.com/entries/icons/mobile/000/000/554/picard-facepalm.jpg) -->
+# UPDATE: Well, not anymore!
+
+![Thanks Ted](./6r1atj.jpg)
+
+Problem solved!
 
 ------
 
