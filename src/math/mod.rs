@@ -2,6 +2,7 @@
 #![allow(unused_mut)]
 #![allow(unused_variables)]
 
+
 ///
 /// # Terrible Prime Calculator in Rust
 /// ### by denwong47
@@ -14,6 +15,7 @@
 use std::thread;
 use std::cmp;
 use std::sync;
+use core::ops::Range;
 
 // Thousand Number formatter #9,001
 use num_format::{Locale, ToFormattedString};
@@ -21,7 +23,8 @@ use num_format::{Locale, ToFormattedString};
 // Maximum number of concurrent threads.
 // This is important because Rust implements system threads, not green threads.
 // So if we spawn more threads than we are supposed to, we overwhelm the OS Scheduler and we slow down.
-const MAX_WORKERS: usize = 10;
+const MAX_WORKERS:   usize = 10;
+const MIN_CHUNKSIZE: usize = 10000;
 
 /// Determines if a number is a prime number.
 /// This is a wrapper around `is_prime_with_known_primes`, which actually does the work.
@@ -44,7 +47,7 @@ pub fn is_prime(
 
 /// Private function
 /// This actually do the work of checking primes.
-/// Give it a slice of SORTED prime numbers up to at least sqrt of num, then we have our 
+/// Mandatory: Give it a slice of SORTED prime numbers up to at least sqrt of num.
 fn is_prime_with_known_primes(
     num:u64,
     primes:&[u64],
@@ -67,6 +70,26 @@ fn is_prime_with_known_primes(
     return true;
 }
 
+/// ### List all the primes within a range 
+/// 
+/// Internal function, allowing to list primes only within a range.
+/// Mandatory: Give it a slice of SORTED prime numbers up to at least sqrt of range::max.
+fn list_primes_in_range_unthreaded(
+    range:Range<u64>,
+    primes:&[u64],
+) -> Vec<u64> {
+    let mut _list_of_primes:Vec<u64> = Vec::new();
+
+    // We just dumb check everything from 2 up to num.
+    for _candidate in range {
+        if is_prime_with_known_primes(_candidate, primes) {
+            _list_of_primes.push(_candidate)
+        }
+    }
+
+    return _list_of_primes;
+}
+
 /// ### List all the prime up to `num` by going through all of them one by one.
 /// 
 /// There is no threading in this function - it simply loop through the range from 2 to `num`.
@@ -77,7 +100,7 @@ pub fn list_primes_unthreaded(
     let mut _list_of_primes:Vec<u64> = Vec::new();
 
     // We just dumb check everything from 2 up to num.
-    for _candidate in 2..num {
+    for _candidate in 2..num+1 {
         if is_prime_with_known_primes(_candidate, &_list_of_primes) {
             _list_of_primes.push(_candidate)
         }
@@ -113,6 +136,8 @@ pub fn list_primes_unthreaded(
 /// Validating all primes (without threading) up to 100,000 had taken 0.031746s.
 /// 
 /// ^^ What the!???!!!
+/// 
+
 pub fn list_primes_threaded(
     num:u64,
 ) -> Vec<u64> {
@@ -124,8 +149,24 @@ pub fn list_primes_threaded(
         let _range_min:u64 = _range_max +1;
         _range_max = cmp::min(num+1, _range_min*_range_min);
 
+        let _range_count:u64    = _range_max - _range_min + 1;
+        let _no_of_chunks:u64   = cmp::min(
+            (((_range_max-_range_min+1) as f64)/(MIN_CHUNKSIZE as f64)).ceil() as u64,
+            MAX_WORKERS as u64,
+        );
+        let _chunk_size:u64     = ((_range_count as f64)/(_no_of_chunks as f64)).ceil() as u64;
+
+        println!(
+            "Range from {} to {} has {} members, proposing {} chunks of size {}.",
+            _range_min,
+            _range_max,
+            _range_count,
+            _no_of_chunks,
+            _chunk_size,
+        );
+
         // Set up our Vec of threads, so that we can await them
-        let mut _threads:Vec<thread::JoinHandle<Option<u64>>> = Vec::with_capacity(MAX_WORKERS);
+        let mut _threads:Vec<thread::JoinHandle<Vec<u64>>> = Vec::with_capacity(MAX_WORKERS);
 
         // A block to expire the cloned list of primes:
         {
@@ -137,47 +178,30 @@ pub fn list_primes_threaded(
             // Just to see how long it takes to clone this guy.
             println!("Cloned {} items to an Arc.", _list_of_primes.len());
 
-            for _num in _range_min.._range_max {
-                let _num_in_scope:u64 = _num;
+            for _chunk_id in 0.._no_of_chunks {
                 let _list_of_primes_ref = sync::Arc::clone(&_arc_of_primes);
 
+                let _chunk:Range<u64> = (_range_min + _chunk_id * _chunk_size)..cmp::min(_range_min + (_chunk_id+1) * _chunk_size, _range_max);
+
                 // DEBUG PRINT
-                if _num % 10000 == 0{
-                    println!("Spawning thread for {}...", _num)
-                }
+                println!("Spawning thread for {:?}...", _chunk);
     
                 // Creates a thread and push it to the Vec.
                 _threads.push(
-                    thread::spawn(move ||->Option<u64> {
-                        // Thread returns Some(number) if prime, otherwise None
-                        if is_prime_with_known_primes(_num_in_scope, &_list_of_primes_ref){
-                            return Some(_num_in_scope)
-                        } else {
-                            return None
-                        }
+                    thread::spawn(move ||->Vec<u64> {
+                        return list_primes_in_range_unthreaded(
+                            _chunk,
+                            &_list_of_primes_ref,
+                        )
                     })
                 );
+            }
 
-                // If either:
-                // - we have all threads occupied, or
-                // - we are on the last number,
-                // then we wait for the threads to join.
-                while 
-                    _threads.len() >= MAX_WORKERS || 
-                    (
-                        _num>=_range_max-1 &&
-                        _threads.len()>0
-                    )
-                
-                {
-                    // Wait til the first thread is done
-                    let _result:Option<u64> = _threads.pop().expect("No Threads left!").join().unwrap();
+            // Now unwrap all the thread returns
+            for _thread in _threads {
+                let mut _thread_returned:Vec<u64> = _thread.join().unwrap();
 
-                    match _result {
-                        Some(num) => _list_of_primes.push(num),
-                        None => (),
-                    }
-                }
+                _list_of_primes.append(&mut _thread_returned);
             }
         }
 
