@@ -8,8 +8,9 @@ mod math;
 
 
 fn main() {
+
     const NUM_TO_TEST:u64 = 79;
-    const MAX_RANGE:u64 = u64::pow(10,6);
+    const MAX_RANGE:u64 = u64::pow(10,8);
 
     // Testing only; make sure math:is_prime is still working.
     // println!(
@@ -26,7 +27,7 @@ fn main() {
     let mut prime_list:Vec<u64> = Vec::new();
 
     // Let the race begin
-    let sec = timeit_loops!(100, {
+    let sec = timeit_loops!(10, {
         prime_list = math::list_primes(MAX_RANGE);
     });
 
