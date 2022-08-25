@@ -23,8 +23,8 @@ use num_format::{Locale, ToFormattedString};
 // Maximum number of concurrent threads.
 // This is important because Rust implements system threads, not green threads.
 // So if we spawn more threads than we are supposed to, we overwhelm the OS Scheduler and we slow down.
-const MAX_WORKERS:   usize = 10;
-const MIN_CHUNKSIZE: usize = 10000;
+const MAX_WORKERS:   usize = 20;
+const MIN_CHUNKSIZE: usize = 10102;
 
 /// Determines if a number is a prime number.
 /// This is a wrapper around `is_prime_with_known_primes`, which actually does the work.
@@ -158,52 +158,68 @@ pub fn list_primes_threaded(
 
         println!(
             "Range from {} to {} has {} members, proposing {} chunks of size {}.",
-            _range_min,
-            _range_max,
-            _range_count,
-            _no_of_chunks,
-            _chunk_size,
+            &_range_min,
+            &_range_max,
+            &_range_count,
+            &_no_of_chunks,
+            &_chunk_size,
         );
 
-        // Set up our Vec of threads, so that we can await them
-        let mut _threads:Vec<thread::JoinHandle<Vec<u64>>> = Vec::with_capacity(MAX_WORKERS);
+        if _no_of_chunks > 1 {
+            // Set up our Vec of threads, so that we can await them
+            let mut _threads:Vec<thread::JoinHandle<Vec<u64>>> = Vec::with_capacity(MAX_WORKERS);
 
-        // A block to expire the cloned list of primes:
-        {
-            // While this is a clone of _list_of_primes, this should be a valid use because _list_of_primes needs to be mutable within this block.
-            // We are also only doing this once every while segment, so not a lot.
-            let _arc_of_primes:sync::Arc<Vec<u64>> = sync::Arc::new(_list_of_primes.clone());
-
-            // DEBUG PRINT
-            // Just to see how long it takes to clone this guy.
-            println!("Cloned {} items to an Arc.", _list_of_primes.len());
-
-            for _chunk_id in 0.._no_of_chunks {
-                let _list_of_primes_ref = sync::Arc::clone(&_arc_of_primes);
-
-                let _chunk:Range<u64> = (_range_min + _chunk_id * _chunk_size)..cmp::min(_range_min + (_chunk_id+1) * _chunk_size, _range_max);
+            // A block to expire the cloned list of primes:
+            {
+                // While this is a clone of _list_of_primes, this should be a valid use because _list_of_primes needs to be mutable within this block.
+                // We are also only doing this once every while segment, so not a lot.
+                let _arc_of_primes:sync::Arc<Vec<u64>> = sync::Arc::new(_list_of_primes.clone());
 
                 // DEBUG PRINT
-                println!("Spawning thread for {:?}...", _chunk);
-    
-                // Creates a thread and push it to the Vec.
-                _threads.push(
-                    thread::spawn(move ||->Vec<u64> {
-                        return list_primes_in_range_unthreaded(
-                            _chunk,
-                            &_list_of_primes_ref,
-                        )
-                    })
-                );
-            }
+                // Just to see how long it takes to clone this guy.
+                println!("Cloned {} items to an Arc.", _list_of_primes.len());
 
-            // Now unwrap all the thread returns
-            for _thread in _threads {
-                let mut _thread_returned:Vec<u64> = _thread.join().unwrap();
+                for _chunk_id in 0.._no_of_chunks {
+                    let _list_of_primes_ref = sync::Arc::clone(&_arc_of_primes);
 
-                _list_of_primes.append(&mut _thread_returned);
+                    let _chunk:Range<u64> = (_range_min + _chunk_id * _chunk_size)..cmp::min(_range_min + (_chunk_id+1) * _chunk_size, _range_max);
+
+                    // DEBUG PRINT
+                    println!("Spawning thread for {:?}...", _chunk);
+
+                    // Creates a thread and push it to the Vec.
+                    _threads.push(
+                        thread::spawn(move ||->Vec<u64> {
+                            println!("Chunk {:?} thread started.", &_chunk);
+                            return list_primes_in_range_unthreaded(
+                                _chunk,
+                                &_list_of_primes_ref,
+                            )
+                        })
+                    );
+                }
+
+                // Now unwrap all the thread returns
+                for _thread in _threads {
+                    let mut _thread_returned:Vec<u64> = _thread.join().unwrap();
+
+                    _list_of_primes.append(&mut _thread_returned);
+                }
             }
+        } else {
+            // One thread only, just do it(TM)
+            let _chunk:Range<u64> = _range_min.._range_max;
+
+            println!("No chunks required for {:?}; single thread method called.", &_chunk);
+            let mut _single_thread_result:Vec<u64> = list_primes_in_range_unthreaded(
+                _range_min.._range_max,
+                &_list_of_primes,
+            );
+            
+            _list_of_primes.append(&mut _single_thread_result);
         }
+
+        
 
         // If you don't sort this you will soon discover 15 is a prime!
         _list_of_primes.sort();
