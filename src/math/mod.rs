@@ -4,13 +4,21 @@
 
 
 ///
-/// # Terrible Prime Calculator in Rust
+/// # Not too terrible Prime Calculator in Rust
 /// ### by denwong47
 /// 
-/// The feature of this module is that it is somehow slower than Python.
-/// i.e. I have achieved the impossible.
-/// Go figure.
+/// Sample output and runtime on an Apple M1 Pro:
+/// Within the first 1,000,000 numbers, there are 78,498 prime numbers.
+/// Calculating all primes up to 1,000,000 had taken 0.0026658999999999997s.
+/// Validating all primes up to 1,000,000 had taken 0.015052s.
 /// 
+/// Within the first 100,000,000 numbers, there are 5,761,455 prime numbers.
+/// Calculating all primes up to 100,000,000 had taken 0.6158214s.
+/// Validating all primes up to 100,000,000 had taken 4.697561s.
+/// 
+/// NOTE:
+/// Calculations are done threaded;
+/// Validation is done serially, unthreaded.
 
 use std::thread;
 use std::cmp;

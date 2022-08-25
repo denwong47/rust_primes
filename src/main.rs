@@ -10,7 +10,7 @@ mod math;
 fn main() {
 
     const NUM_TO_TEST:u64 = 79;
-    const MAX_RANGE:u64 = u64::pow(10,8);
+    const MAX_RANGE:u64 = u64::pow(10,6);
 
     // Testing only; make sure math:is_prime is still working.
     // println!(
