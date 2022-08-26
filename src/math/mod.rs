@@ -136,17 +136,6 @@ pub fn list_primes_unthreaded(
 /// n = 100         We check all numbers between 101 to 101*101-1=10202 with our prime list ...
 /// 
 /// We then stop when upper_limit is reached.
-/// 
-/// On a i7-8700 (65W):
-/// PYTHON:
-/// Calculating all primes up to 100,000 took 0.062705s.
-/// 
-/// RUST:
-/// Calculating all primes up to 100,000 took 4.592612s.
-/// Validating all primes (without threading) up to 100,000 had taken 0.031746s.
-/// 
-/// ^^ What the!???!!!
-/// 
 
 pub fn list_primes_threaded(
     num:u64,
