@@ -144,5 +144,10 @@ cython_debug/
 
 # Added by cargo
 /target
-!/target/release/rust_primes
-!/*/README.md
+**/.rustc_info.json
+
+# Only include the release binary
+/bin/rust_primes_backend/debug
+/bin/rust_primes_backend/release/*
+!/bin/rust_primes_backend/release/rust_primes
+!/bin/rust_primes_backend/release/*.py

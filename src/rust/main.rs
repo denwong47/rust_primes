@@ -53,7 +53,7 @@ fn main() {
                             prime_list.len().to_formatted_string(&Locale::en)
                         )
                     },
-                    _ => output.display(&prime_list),
+                    _ => output.display(&prime_list.len()),
                 }
             },
 
