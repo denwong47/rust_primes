@@ -8,7 +8,7 @@ use serde::ser::Serialize;
 pub enum Output {
     #[strum(ascii_case_insensitive)]
     Raw,
-    
+
     #[strum(ascii_case_insensitive)]
     Pickle,
 
@@ -33,7 +33,7 @@ impl Output {
                 ).or_else(
                     |_| {Ok::<Vec<u8>, u8>(vec![0,0,0,0])}
                 ).unwrap();
-        
+
                 let mut stdout_writer = stdout();
 
                 // Must use the return
