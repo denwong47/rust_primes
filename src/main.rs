@@ -1,59 +1,104 @@
 #[macro_use]
 extern crate timeit;
 
+use std::env;
 use num_format::{Locale, ToFormattedString};
 
 // See math/mod.rs
 mod math;
+mod args;
 
+use args::{CommandLineArgs, Output};
 
 fn main() {
 
-    const NUM_TO_TEST:u64 = 79;
-    const MAX_RANGE:u64 = u64::pow(10,6);
+    const DEFAULT_MAX_RANGE:u64 = u64::pow(10,6);
 
-    // Testing only; make sure math:is_prime is still working.
-    // println!(
-    //     "It is {} that {} is a prime number.",
-    //         math::is_prime(NUM_TO_TEST),
-    //         NUM_TO_TEST.to_formatted_string(&Locale::en)
-    // );
-    assert_eq!(
-        math::is_prime(NUM_TO_TEST),
-        true,
-    );
+    let mut print_time:bool = false;
 
-    // This is where we will store our list
-    let mut prime_list:Vec<u64> = Vec::new();
+    fn execute(print_time:&mut bool) {
+        let args: Vec<String> = env::args().collect();
 
-    // Let the race begin
-    let sec = timeit_loops!(10, {
-        prime_list = math::list_primes(MAX_RANGE);
-    });
-
-    println!(
-        "Within the first {} numbers, there are {} prime numbers.",
-            MAX_RANGE.to_formatted_string(&Locale::en),
-            prime_list.len().to_formatted_string(&Locale::en)
-    );
+        match CommandLineArgs::from_args(
+            &args,
+            CommandLineArgs::Count(DEFAULT_MAX_RANGE, Output::Readable),
+        ) {
+            CommandLineArgs::Check(value, output) => {
+                let result = math::is_prime(value);
+                match output {
+                    Output::Raw => println!("{:?}", result),
+                    Output::Readable => {
+                        *print_time = true;
+                        println!(
+                            "{} is {}a prime number.",
+                            value,
+                            match result {
+                                true => "",
+                                false => "NOT ",
+                            }
+                        );
+                    }
+                }
+            },
     
-    println!(
-        "Calculating all primes up to {} had taken {}s.",
-            MAX_RANGE.to_formatted_string(&Locale::en),
-            sec,
-    );
+            CommandLineArgs::Count(value, output) => {  
+                let prime_list = math::list_primes(value);
+                match output {
+                    Output::Raw => println!("{:?}", prime_list.len()),
+                    Output::Readable => {
+                        *print_time = true;
+                        println!(
+                            "Within the first {} numbers, there are {} prime numbers.",
+                            value.to_formatted_string(&Locale::en),
+                            prime_list.len().to_formatted_string(&Locale::en)
+                        )
+                    }
+                }
+            },
+    
+            CommandLineArgs::List(value, output) => {
+                let prime_list = math::list_primes(value);
+                match output {
+                    Output::Raw => println!("{:?}", prime_list),
+                    Output::Readable => {
+                        *print_time = true;
+                        println!(
+                            "Prime numbers within {}:\n{:?}",
+                            value.to_formatted_string(&Locale::en),
+                            prime_list
+                        )
+                    }
+                }
+            },
+            
+            CommandLineArgs::Invalid => {
+                println!(
+                    "Invalid command input."
+                )
+            }
+        }
+    }
 
-    // Validating it using the "dumb", unthreaded version... which is somehow faster.
-    let sec = timeit_loops!(1, {
-        assert_eq!(
-            prime_list,
-            math::list_primes_unthreaded(MAX_RANGE)
+    let sec = timeit_loops!(1, {execute(&mut print_time)});
+
+    if print_time {
+        println!(
+            "Execution had taken {:.6}s.",
+            sec,
         );
-    });
+    }
 
-    println!(
-        "Validating all primes up to {} had taken {}s.",
-            MAX_RANGE.to_formatted_string(&Locale::en),
-            sec,
-    );
+    // // Validating it using the "dumb", unthreaded version... which is somehow faster.
+    // let sec = timeit_loops!(1, {
+    //     assert_eq!(
+    //         prime_list,
+    //         math::list_primes_unthreaded(DEFAULT_MAX_RANGE)
+    //     );
+    // });
+
+    // println!(
+    //     "Validating all primes up to {} had taken {}s.",
+    //         DEFAULT_MAX_RANGE.to_formatted_string(&Locale::en),
+    //         sec,
+    // );
 }
