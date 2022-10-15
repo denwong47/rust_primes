@@ -15,6 +15,17 @@
 
 Problem solved!
 
+## Usage:
+
+```sh
+rust_primes check 79        # Check if a number is prime
+rust_primes count 1000      # Count the number of primes <= 1000
+rust_primes list 1000       # List all the primes <=1000 in [2, 3, 5... ] format
+
+# To 
+rust_primes list 1000 raw   # Remove all readable strings and print result only.
+```
+
 ------
 
 Well as the name of this repo suggests, I am learning Rust.
