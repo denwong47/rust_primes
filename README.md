@@ -15,6 +15,12 @@ The primary public functions are:
 * "count_prime()" - Count the number of primes within a provided
   value.
 
+> ### NOTE
+> The pre-compiled Rust shipped with this package is built for x86 architecture. If your system is
+> ARM based, it is preferrable to re-compile the backend using:
+>
+>    cargo build --release --target-dir bin/rust_primes_backend
+
 
 rust_primes.backend module
 ==========================
