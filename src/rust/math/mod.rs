@@ -6,16 +6,16 @@
 ///
 /// # Not too terrible Prime Calculator in Rust
 /// ### by denwong47
-/// 
+///
 /// Sample output and runtime on an Apple M1 Pro:
 /// Within the first 1,000,000 numbers, there are 78,498 prime numbers.
 /// Calculating all primes up to 1,000,000 had taken 0.0026658999999999997s.
 /// Validating all primes up to 1,000,000 had taken 0.015052s.
-/// 
+///
 /// Within the first 100,000,000 numbers, there are 5,761,455 prime numbers.
 /// Calculating all primes up to 100,000,000 had taken 0.6158214s.
 /// Validating all primes up to 100,000,000 had taken 4.697561s.
-/// 
+///
 /// NOTE:
 /// Calculations are done threaded;
 /// Validation is done serially, unthreaded.
@@ -46,9 +46,9 @@ pub fn is_prime(
 
     // If we don't have a list of primes yet, find a list of primes to evaluate against first.
     let _list_of_primes:Vec<u64> = list_primes(
-        (num as f64).sqrt() as u64, 
+        (num as f64).sqrt() as u64,
     );
-    
+
     return is_prime_with_known_primes(
         num,
         &_list_of_primes,
@@ -80,8 +80,8 @@ fn is_prime_with_known_primes(
     return true;
 }
 
-/// ### List all the primes within a range 
-/// 
+/// ### List all the primes within a range
+///
 /// Internal function, allowing to list primes only within a range.
 /// Mandatory: Give it a slice of SORTED prime numbers up to at least sqrt of range::max.
 fn list_primes_in_range_unthreaded(
@@ -101,7 +101,7 @@ fn list_primes_in_range_unthreaded(
 }
 
 /// ### List all the prime up to `num` by going through all of them one by one.
-/// 
+///
 /// There is no threading in this function - it simply loop through the range from 2 to `num`.
 /// Mysteriously... this is very fast. WHAT?
 pub fn list_primes_unthreaded(
@@ -120,21 +120,21 @@ pub fn list_primes_unthreaded(
 }
 
 /// ### List all the prime including and up to num.
-/// 
+///
 /// How it works:
-/// 
+///
 /// For any given integer n, the smallest number which has a minimum factor >n will be (n+1)*(n+1).
 /// Therefore assuming we know all the primes up to value n: [2, 3, 5... k] where k <= n, we can safely assert that all non-prime numbers up to (n+1)*(n+1)-1 will have at least one factor within our list.
-/// 
+///
 /// Thus, for every n, we will take what we already know are primes: [2, 3, 5... k] and check for factors in all values between n+1 to (n+1)*(n+1)-1. Now that we know all the primes up to (n+1)*(n+1) (which we know for sure is NOT a prime), then we can take (n+1)*(n+1) as the new n, then repeat.
-/// 
+///
 /// i.e.
 /// n = 2           We check all numbers between 3 to 3*3-1=8 with our prime list of [2],
 /// yielding: [2, 3, 5, 7]
 /// n = 9           We check all numbers between 10 to 10*10-1=99 with our prime list of [2, 3, 5, 7],
 /// yielding: [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
 /// n = 100         We check all numbers between 101 to 101*101-1=10202 with our prime list ...
-/// 
+///
 /// We then stop when upper_limit is reached.
 
 pub fn list_primes_threaded(
@@ -145,7 +145,7 @@ pub fn list_primes_threaded(
     // So this is improved to make the first bucket 2..2048, then we scale from there onwards, presumably threaded.
     let mut _range_max:u64              = cmp::min(UNTHREADED_CUT_OFF, num);
     let mut _list_of_primes:Vec<u64>    = list_primes_unthreaded(_range_max); //vec![2];
-    
+
     while _range_max < num {
         let _range_min:u64 = _range_max +1;
         _range_max = cmp::min(num+1, _range_min*_range_min);
@@ -206,7 +206,7 @@ pub fn list_primes_threaded(
 
                 _list_of_primes.append(&mut _thread_returned);
             }
-        }     
+        }
 
         // If you don't sort this you will soon discover 15 is a prime!
         _list_of_primes.sort();
@@ -214,8 +214,8 @@ pub fn list_primes_threaded(
         // DEBUG PRINT
         // println!("{} primes found up to {}.", _list_of_primes.len().to_formatted_string(&Locale::en), _range_max.to_formatted_string(&Locale::en))
     }
-        
-    
+
+
     return _list_of_primes;
 }
 

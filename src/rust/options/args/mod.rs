@@ -44,7 +44,7 @@ pub enum CommandLineArgs {
 impl CommandLineArgs {
     pub fn from_args(
         args:&Vec<String>,
-        default:Self,        
+        default:Self,
     ) -> Self {
         let mut query_type_option = args.try_get(1);
         let query_int_option = args.try_get(2);

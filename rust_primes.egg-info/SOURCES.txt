@@ -1,0 +1,9 @@
+LICENSE
+README.md
+pyproject.toml
+rust_primes.egg-info/PKG-INFO
+rust_primes.egg-info/SOURCES.txt
+rust_primes.egg-info/dependency_links.txt
+rust_primes.egg-info/requires.txt
+rust_primes.egg-info/top_level.txt
+src/py/rust_primes/__init__.py

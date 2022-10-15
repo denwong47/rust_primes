@@ -41,8 +41,8 @@ fn main() {
                     _ => output.display(&result),
                 }
             },
-    
-            CommandLineArgs::Count(value, output) => {  
+
+            CommandLineArgs::Count(value, output) => {
                 let prime_list = math::list_primes(value);
                 match output {
                     Output::Readable => {
@@ -56,7 +56,7 @@ fn main() {
                     _ => output.display(&prime_list),
                 }
             },
-    
+
             CommandLineArgs::List(value, output) => {
                 let prime_list = math::list_primes(value);
                 match output {
@@ -71,7 +71,7 @@ fn main() {
                     _ => output.display(&prime_list),
                 }
             },
-            
+
             CommandLineArgs::Invalid => {
                 println!(
                     "Invalid command input."
@@ -88,7 +88,7 @@ fn main() {
             sec,
         );
     }
-    
+
     // // Validating it using the "dumb", unthreaded version... which is somehow faster.
     // let sec = timeit_loops!(1, {
     //     assert_eq!(

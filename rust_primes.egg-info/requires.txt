@@ -1,0 +1,7 @@
+numpy
+
+[dev]
+pre-commit
+pydata-sphinx-theme
+pytest
+sphinx
