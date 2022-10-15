@@ -1,6 +1,8 @@
 use std::str::FromStr;
 use strum::EnumString;
 
+use crate::options::output::Output;
+
 trait VecTryGet<T> {
     fn try_get(
         &self,
@@ -23,17 +25,6 @@ impl<T> VecTryGet<T> for Vec<T> {
 
 const INVALID_INPUT:u64 = 0;
 
-
-#[derive(Debug, PartialEq)]
-pub enum Output {
-    Raw,
-    Readable,
-}
-impl Default for Output {
-    fn default() -> Self {
-        return Self::Readable;
-    }
-}
 
 #[derive(Debug, EnumString, PartialEq)]
 pub enum CommandLineArgs {
@@ -60,7 +51,14 @@ impl CommandLineArgs {
         let query_output_option = args.try_get(3);
 
         let query_output:Output = match query_output_option {
-            Some(_) => Output::Raw,
+            Some(option) => {
+                match option.to_lowercase().as_str() {
+                    "raw"       => Output::Raw,
+                    "pickle"    => Output::Pickle,
+                    "readable"  => Output::Readable,
+                    _ => Output::default(),
+                }
+            },
             None => Output::Readable,
         };
 

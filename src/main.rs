@@ -6,9 +6,10 @@ use num_format::{Locale, ToFormattedString};
 
 // See math/mod.rs
 mod math;
-mod args;
+mod options;
 
-use args::{CommandLineArgs, Output};
+use options::output::Output;
+use options::args::CommandLineArgs;
 
 fn main() {
 
@@ -26,7 +27,6 @@ fn main() {
             CommandLineArgs::Check(value, output) => {
                 let result = math::is_prime(value);
                 match output {
-                    Output::Raw => println!("{:?}", result),
                     Output::Readable => {
                         *print_time = true;
                         println!(
@@ -37,14 +37,14 @@ fn main() {
                                 false => "NOT ",
                             }
                         );
-                    }
+                    },
+                    _ => output.display(&result),
                 }
             },
     
             CommandLineArgs::Count(value, output) => {  
                 let prime_list = math::list_primes(value);
                 match output {
-                    Output::Raw => println!("{:?}", prime_list.len()),
                     Output::Readable => {
                         *print_time = true;
                         println!(
@@ -52,14 +52,14 @@ fn main() {
                             value.to_formatted_string(&Locale::en),
                             prime_list.len().to_formatted_string(&Locale::en)
                         )
-                    }
+                    },
+                    _ => output.display(&prime_list),
                 }
             },
     
             CommandLineArgs::List(value, output) => {
                 let prime_list = math::list_primes(value);
                 match output {
-                    Output::Raw => println!("{:?}", prime_list),
                     Output::Readable => {
                         *print_time = true;
                         println!(
@@ -67,7 +67,8 @@ fn main() {
                             value.to_formatted_string(&Locale::en),
                             prime_list
                         )
-                    }
+                    },
+                    _ => output.display(&prime_list),
                 }
             },
             
@@ -87,7 +88,7 @@ fn main() {
             sec,
         );
     }
-
+    
     // // Validating it using the "dumb", unthreaded version... which is somehow faster.
     // let sec = timeit_loops!(1, {
     //     assert_eq!(
