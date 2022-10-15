@@ -10,7 +10,7 @@ calculated using a Rust backend.
 .. toctree::
    :maxdepth: 3
 
-   modules
+   rust_primes
 
 Indices and tables
 ==================
