@@ -6,7 +6,7 @@ Python will always use the `release` variant of `rust_primes`.
 To rebuild, run in the root directory:
 
 ```sh
-cargo build --release
+cargo build --release --target-dir ./bin/rust_primes_backend
 ```
 
 ## Example use for `rust_primes` binary:

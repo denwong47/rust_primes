@@ -150,3 +150,4 @@ cython_debug/
 /bin/rust_primes_backend/debug
 /bin/rust_primes_backend/release/*
 !/bin/rust_primes_backend/release/rust_primes
+!/bin/rust_primes_backend/release/*.py
