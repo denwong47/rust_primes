@@ -14,6 +14,6 @@ The primary public functions are:
 - :func:`~rust_primes.func.list_primes` - Return a list of primes within a provided value;
 - :func:`~rust_primes.func.count_primes` - Count the number of primes within a provided value.
 """
-from . import exceptions
+from . import config, exceptions
 from .backend import BACKEND_PATH
 from .func import count_primes, is_prime, list_primes

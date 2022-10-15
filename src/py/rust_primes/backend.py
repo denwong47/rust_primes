@@ -2,6 +2,7 @@
 """
 Subprocess controller.
 """
+
 import enum
 import functools
 import pickle
@@ -9,7 +10,7 @@ import subprocess
 from importlib import resources
 from typing import List, Literal, Tuple, Union
 
-from . import exceptions
+from . import config, exceptions
 
 BACKEND_PATH = resources.files("rust_primes_backend.release").joinpath("rust_primes")
 
@@ -35,7 +36,6 @@ class CommandType(enum.Enum):
         return tuple(map(str, cls._value2member_map_))
 
 
-@functools.lru_cache()
 def call(
     value: int,
     *,
@@ -89,3 +89,7 @@ def call(
         raise exceptions.BackendReturnError(
             f"Backend return value is corrupted: {repr(_output[:1024])}..."
         )
+
+
+if not config.DISABLE_CACHE:
+    call = functools.lru_cache()(call)
