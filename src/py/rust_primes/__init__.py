@@ -65,3 +65,20 @@ Returns
 int
     Number of prime numbers up to and including ``num``.
 """
+
+upper_bound_of_nth_prime = bin.upper_bound_of_nth_prime
+"""
+Return the highest possible value of the nth prime.
+
+The result is given as a :class:`int`.
+
+Parameters
+----------
+n : int
+    The ``n``th prime to be estimated.
+
+Returns
+-------
+int
+    The upper bound of the ``n``th prime.
+"""

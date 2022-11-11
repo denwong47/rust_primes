@@ -1,7 +1,7 @@
 use std::{cmp};
 use std::vec::{Vec};
+use std::thread;
 use ndarray::{Array, ArrayBase, Dim, OwnedRepr, s};
-
 
 /// Determines if a number is a prime number.
 /// This is a wrapper around `is_prime_with_known_primes`, which actually does the work.
@@ -71,6 +71,7 @@ fn prime_mask(ubound:u64) -> ArrayBase<OwnedRepr<bool>, Dim<[usize; 1]>> {
 
     return sieve;
 }
+
 
 /// List all the primes within `ubound`.
 /// Calls `prime_mask`, and apply the mask on `enumerate`.
