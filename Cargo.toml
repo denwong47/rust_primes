@@ -19,9 +19,8 @@ pyo3 = { version = "0.17.1", features = ["extension-module"] }
 num-format = "0.4.0"
 timeit = "0.1.2"
 strum = { version = "0.24", features = ["derive"] }
-serde = { version = "1.0.145", features = ["derive"] }
-serde-pickle = "1.1.1"
-serde_with = "2.0.1"
+ndarray = "0.15.6"
+# rayon = "1.5.3"
 
 [package.metadata.maturin]
 python-source = "src/py"
