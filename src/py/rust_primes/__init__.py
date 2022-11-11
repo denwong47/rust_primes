@@ -16,6 +16,10 @@ import functools
 
 from . import lib_rust_primes as bin
 
+SieveMethod = bin.SieveMethod
+# Do this in Rust?
+SieveMethod.__hash__ = lambda self: hash(str(self))
+
 is_prime = bin.is_prime
 """
 Check if the given number is prime.

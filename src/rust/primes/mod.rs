@@ -5,6 +5,10 @@ pub use base::{
     is_prime,
     list_primes,
     count_primes,
+
+    Sievable,
+    SieveOfAtkin,
+    SieveOfEratosthenes,
 };
 
 pub use formulas::{
