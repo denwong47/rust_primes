@@ -23,8 +23,12 @@ import rust_primes
         (10**9, 50_847_534),
     ],
 )
-def test_count_primes(num, count):
+@pytest.mark.parametrize(
+    ["method"],
+    ([rust_primes.SieveMethod.ATKIN], [rust_primes.SieveMethod.ERATOSTHENES]),
+)
+def test_count_primes(num, method, count):
     """
     Test if the prime counts are coorect.
     """
-    assert rust_primes.count_primes(num) == count
+    assert rust_primes.count_primes(num, method=method) == count

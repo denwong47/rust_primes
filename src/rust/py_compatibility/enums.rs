@@ -1,3 +1,6 @@
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
+
 use pyo3::prelude::*;
 
 use crate::primes::{
@@ -7,10 +10,20 @@ use crate::primes::{
 };
 
 #[pyclass(module="rust_primes")]
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Hash)]
 pub enum SieveMethod {
     ATKIN,
     ERATOSTHENES
+}
+#[pymethods]
+impl SieveMethod {
+    fn __hash__(&self) -> u64 {
+        let mut hasher = DefaultHasher::new();
+        self.hash(&mut hasher);
+        hasher.finish()
+    }
+
+
 }
 impl Default for SieveMethod {
     fn default() -> Self {
