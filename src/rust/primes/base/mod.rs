@@ -1,6 +1,5 @@
 use std::{cmp};
 use std::vec::{Vec};
-use std::thread;
 use ndarray::{Array, ArrayBase, Dim, OwnedRepr, s};
 
 /// Determines if a number is a prime number.
