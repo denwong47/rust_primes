@@ -12,6 +12,8 @@ This project includes a Rust binary backend:
   :attr:`~rust_primes.bin`.
 """
 
+import functools
+
 from . import lib_rust_primes as bin
 
 is_prime = bin.is_prime
@@ -32,7 +34,7 @@ bool
     ``True`` if prime, ``False`` otherwise.
 """
 
-list_primes = bin.list_primes
+list_primes = functools.lru_cache(bin.list_primes)
 """
 List all primes numbers less than or equal to ``num``.
 
@@ -49,7 +51,7 @@ List[int]
     List of all primes, starting from 2, up to and including ``num``.
 """
 
-count_primes = bin.count_primes
+count_primes = functools.lru_cache(bin.count_primes)
 """
 Count the number of primes numbers less than or equal to ``num``.
 
@@ -66,7 +68,7 @@ int
     Number of prime numbers up to and including ``num``.
 """
 
-upper_bound_of_nth_prime = bin.upper_bound_of_nth_prime
+upper_bound_of_nth_prime = functools.lru_cache(bin.upper_bound_of_nth_prime)
 """
 Return the highest possible value of the nth prime.
 

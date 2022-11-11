@@ -14,11 +14,26 @@ pub fn upper_bound_of_nth_prime(n:u64) -> u64 {
 }
 
 fn upper_bound_of_nth_prime_korollar_g(n:u64) -> u64 {
-    0
+    let nf = n as f64;
+
+    return (
+        nf * (
+            nf.ln() + nf.ln().ln() - 1.
+            + (nf.ln().ln() - 2.) / nf.ln()
+            - (
+                nf.ln().ln().powi(2) - 6. * nf.ln().ln() + 10.273
+            ) / 2. / nf.ln().powi(2)
+        )
+    ) as u64
 }
 
 fn upper_bound_of_nth_prime_dusart_2010(n:u64) -> u64 {
-    0
+    let nf = n as f64;
+
+    return (
+        nf * (nf.ln() + nf.ln().ln() - 1.
+        + (nf.ln().ln() - 2.) / nf.ln())
+    ) as u64
 }
 
 fn upper_bound_of_nth_prime_rosser_schoenfeld_1962(n:u64) -> u64 {
