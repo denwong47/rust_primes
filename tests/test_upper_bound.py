@@ -27,3 +27,13 @@ def test_upper_bound(n, all_primes):
     - n >= 8009824:             Korollar G.
     """
     assert rust_primes.upper_bound_of_nth_prime(n) >= all_primes[n - 1]
+
+
+@pytest.mark.parametrize(["n"], ([10**power] for power in range(MAX_LOG10_N + 1)))
+def test_list_n_primes(n, all_primes):
+    """
+    Test if the list of first ``n`` primes are matching the overall list.
+    """
+    _n_primes = rust_primes.list_n_primes(n)
+    assert len(_n_primes) == n
+    assert _n_primes == all_primes[:n]

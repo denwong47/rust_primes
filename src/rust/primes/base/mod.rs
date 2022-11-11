@@ -13,6 +13,7 @@ pub fn is_prime(
     // If we don't have a list of primes yet, find a list of primes to evaluate against first.
     let _list_of_primes:Vec<u64> = list_primes(
         (num as f64).sqrt() as u64,
+        None,
     );
 
     return is_prime_with_known_primes(
@@ -49,7 +50,10 @@ fn is_prime_with_known_primes(
 /// Using ndarray, the Sieve of Eratosthenes turns out to be the optimal method of calculating
 /// primes. This method does not require threading; instead it relies on ndarray's efficiency when
 /// using `slice_mut` over steps to achieve incredible speed.
-fn prime_mask(ubound:u64) -> ArrayBase<OwnedRepr<bool>, Dim<[usize; 1]>> {
+fn prime_mask(
+    ubound:u64,
+) -> ArrayBase<OwnedRepr<bool>, Dim<[usize; 1]>> {
+
     let mut sieve = Array::from_elem(((ubound+1) as usize, ), true);
 
     // Set 0 and 1 to false
@@ -59,8 +63,9 @@ fn prime_mask(ubound:u64) -> ArrayBase<OwnedRepr<bool>, Dim<[usize; 1]>> {
     // Note that we have to make sure that 2 will be checked at the very least, otherwise no primes
     // will be calculated up to prime_mask(7)!
     if ubound > 2 {
-        for prime in 2..cmp::max(3, ((ubound+1) as f64).sqrt().ceil() as usize){
+        for prime in 2..cmp::max(3, ((ubound+1) as f64).sqrt().ceil() as usize) {
             if sieve[prime] {
+                
                 let mut factors = sieve.slice_mut(s![prime*2..; prime]);
 
                 factors.fill(false);
@@ -74,17 +79,20 @@ fn prime_mask(ubound:u64) -> ArrayBase<OwnedRepr<bool>, Dim<[usize; 1]>> {
 
 /// List all the primes within `ubound`.
 /// Calls `prime_mask`, and apply the mask on `enumerate`.
-pub fn list_primes(ubound:u64) -> Vec<u64>{
+pub fn list_primes(ubound:u64, n_limit:Option<u64>) -> Vec<u64>{
     let sieve = prime_mask(ubound);
 
     // We gather up everything
-    let result: Vec<u64> = sieve.iter()
-                                .enumerate()
-                                .filter(|&(_, &value)| value)
-                                .map(|(index, _)| index as u64)
-                                .collect();
+    let result = sieve.iter()
+                                    .enumerate()
+                                    .filter(|&(_, &value)| value)
+                                    .map(|(index, _)| index as u64);
 
-    return result;
+    return if let Some(n) = n_limit {
+        result.take(n as usize).collect::<Vec<u64>>()
+    } else {
+        result.collect::<Vec<u64>>()
+    }
 }
 
 /// Return the number of primes within `ubound`.

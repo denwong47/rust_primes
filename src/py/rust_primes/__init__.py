@@ -84,3 +84,36 @@ Returns
 int
     The upper bound of the ``n``-th prime.
 """
+
+list_n_primes = functools.lru_cache(bin.list_n_primes)
+"""
+List the first ``n`` primes.
+
+Parameters
+----------
+n : int
+    The number of primes to return.
+
+Returns
+-------
+List[int]
+    A :class:`list` of the first ``n`` primes in :class:`int`.
+"""
+
+nth_prime = functools.lru_cache(bin.nth_prime)
+"""
+Find the ``n``-th prime.
+
+Parameters
+----------
+n : int
+    The ``n``-th prime to return.
+
+Returns
+-------
+int
+    The ``n``-th prime.
+
+None
+    If ``n`` is invalid (e.g. ``0``).
+"""

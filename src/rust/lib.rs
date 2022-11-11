@@ -37,7 +37,7 @@ fn is_prime(num: u64) -> PyResult<bool> {
 /// Calls `prime_mask`, and apply the mask on `enumerate`.
 #[pyfunction]
 fn list_primes(num: u64) -> PyResult<Vec<u64>> {
-    Ok(primes::list_primes(num))
+    Ok(primes::list_primes(num, None))
 }
 
 /// Rust library function.
@@ -57,6 +57,22 @@ fn upper_bound_of_nth_prime(n: u64) -> PyResult<u64> {
     Ok(primes::upper_bound_of_nth_prime(n))
 }
 
+/// Rust library function.
+///
+/// List the first `n` primes.
+#[pyfunction]
+fn list_n_primes(n: u64) -> PyResult<Vec<u64>> {
+    Ok(primes::list_n_primes(n))
+}
+
+/// Rust library function.
+///
+/// List the first `n` primes.
+#[pyfunction]
+fn nth_prime(n: u64) -> PyResult<Option<u64>> {
+    Ok(primes::nth_prime(n))
+}
+
 /// A Python module implemented in Rust.
 #[pymodule]
 fn lib_rust_primes(_py: Python, m: &PyModule) -> PyResult<()> {
@@ -64,5 +80,7 @@ fn lib_rust_primes(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(list_primes, m)?)?;
     m.add_function(wrap_pyfunction!(count_primes, m)?)?;
     m.add_function(wrap_pyfunction!(upper_bound_of_nth_prime, m)?)?;
+    m.add_function(wrap_pyfunction!(list_n_primes, m)?)?;
+    m.add_function(wrap_pyfunction!(nth_prime, m)?)?;
     Ok(())
 }

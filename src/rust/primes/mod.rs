@@ -9,4 +9,6 @@ pub use base::{
 
 pub use formulas::{
     upper_bound_of_nth_prime,
+    list_n_primes,
+    nth_prime,
 };

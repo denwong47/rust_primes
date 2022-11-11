@@ -1,4 +1,6 @@
+use crate::primes::list_primes;
 
+/// Find the mathematical upper bound of the nth prime.
 pub fn upper_bound_of_nth_prime(n:u64) -> u64 {
     match n {
         n if n >= 8009824 => upper_bound_of_nth_prime_korollar_g(n),
@@ -40,4 +42,20 @@ fn upper_bound_of_nth_prime_rosser_schoenfeld_1962(n:u64) -> u64 {
     let nf = n as f64;
 
     return (nf * (nf * nf.ln()).ln()) as u64;
+}
+
+/// List the first n number of primes.
+pub fn list_n_primes(n:u64) -> Vec<u64> {
+    let ubound = upper_bound_of_nth_prime(n);
+
+    return list_primes(ubound, Some(n));
+}
+
+/// Return the nth prime.
+pub fn nth_prime(n:u64) -> Option<u64> {
+    // We have to dereference the in
+    return match &list_n_primes(n).last(){
+        &Some(&prime) => Some(prime),
+        None => None,
+    };
 }
