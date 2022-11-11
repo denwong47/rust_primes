@@ -77,10 +77,10 @@ The result is given as a :class:`int`.
 Parameters
 ----------
 n : int
-    The ``n``th prime to be estimated.
+    The ``n``-th prime to be estimated.
 
 Returns
 -------
 int
-    The upper bound of the ``n``th prime.
+    The upper bound of the ``n``-th prime.
 """
