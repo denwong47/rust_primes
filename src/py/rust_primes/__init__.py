@@ -17,8 +17,20 @@ import functools
 from . import lib_rust_primes as bin
 
 SieveMethod = bin.SieveMethod
-# Do this in Rust?
-# SieveMethod.__hash__ = lambda self: hash(str(self))
+"""
+Pseudo-Enum class to define method of prime sieving.
+
+A pseudo-Enum class defined in Rust, this class is NOT an instance of the Python
+:class:`enum.Enum` class, even if it behaves mostly in the same way.
+
+There are currently two members available:
+
+- :attr:`SieveMethod.ATKIN`: Modern method, but less well optimised by the compiler;
+  not necessarily more performant.
+- :attr:`SieveMethod.ERATOSTHENES`: The ancient method. Using the
+  :meth:`ndarray.slice_mut().step` method, the compiler can optimise the inner loop
+  to a close to ``O(n)`` operation. *This is the default.*
+"""
 
 is_prime = bin.is_prime
 """
