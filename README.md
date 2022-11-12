@@ -35,12 +35,12 @@ returns a "bool" indicating the result.
 
 ### Function `rust_primes.list_primes()`
 
-   - List all primes numbers less than or equal to "num".
+List all primes numbers less than or equal to "num".
 
-   - The result is given in a "List[int]".
+The result is given in a `List[int]`.
 
    - Parameters:
-      - `*num*` (`int`) – The upper bound to be checked.
+      - `num` (`int`) – The upper bound to be checked.
 
    - Returns:
       - List of all primes, starting from 2, up to and including "num".
@@ -50,12 +50,12 @@ returns a "bool" indicating the result.
 
 ### Function `rust_primes.count_primes()`
 
-   - Count the number of primes numbers less than or equal to "num".
+Count the number of primes numbers less than or equal to "num".
 
-   - The result is given as a "int".
+The result is given as a `int`.
 
    - Parameters:
-      - `*num*` (`int`) – The upper bound to be checked.
+      - `num` (`int`) – The upper bound to be checked.
 
    - Returns:
       - Number of prime numbers up to and including "num".
@@ -66,7 +66,7 @@ returns a "bool" indicating the result.
 
 ## `rust_primes.bin` module
 
-* Alias for `lib_rust_primes` module *
+*Alias for `lib_rust_primes` module*
 
 The backend functions, implemented in Rust.
 
