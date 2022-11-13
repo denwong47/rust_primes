@@ -270,7 +270,7 @@ impl SieveOfEratosthenesThreaded {
             };
 
 
-            '_thread_block: {
+            /*'_thread_block:*/ {
                 let primes = ArcArray1::from_vec(collect(&sieve_input, None));
 
                 let ubound_arc = Arc::from(ubound);
@@ -302,7 +302,7 @@ impl SieveOfEratosthenesThreaded {
 
                             // DEBUG PRINT
                             // println!("Mutex block: {}s", timeit_loops!(1, {
-                            '_mutex_block: {
+                            /*'_mutex_block:*/ {
                                 let mut sieve = sieve_mutex_ref.lock().unwrap();
 
                                 sieve.bitand_assign(&sieve_thread);
