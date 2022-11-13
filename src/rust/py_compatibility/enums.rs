@@ -14,7 +14,9 @@ use crate::primes::{
 
 #[pyclass(module="rust_primes")]
 #[derive(Copy, Clone, Debug, Hash, EnumIter)]
+#[allow(non_camel_case_types)]
 pub enum SieveMethod {
+    // Follows Python casing conventions.
     ATKIN,
     ERATOSTHENES,
     ERATOSTHENES_THREADED,
