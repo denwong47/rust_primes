@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-================================
+=============
  rust_primes
-================================
+=============
 
 Utilities for prime calculations in Python using Rust backend.
 
@@ -12,8 +12,7 @@ This project includes a Rust binary backend:
   :attr:`~rust_primes.bin`.
 """
 
-import functools
-
+from . import decorators
 from . import lib_rust_primes as bin
 
 SieveMethod = bin.SieveMethod
@@ -32,7 +31,7 @@ There are currently two members available:
   to a close to ``O(n)`` operation. *This is the default.*
 """
 
-is_prime = bin.is_prime
+is_prime = decorators.TimedFunction(bin.is_prime)
 """
 Check if the given number is prime.
 
@@ -53,7 +52,7 @@ bool
     ``True`` if prime, ``False`` otherwise.
 """
 
-list_primes = functools.lru_cache(bin.list_primes)
+list_primes = decorators.TimedFunction(bin.list_primes)
 """
 List all primes numbers less than or equal to ``num``.
 
@@ -73,7 +72,7 @@ List[int]
     List of all primes, starting from 2, up to and including ``num``.
 """
 
-count_primes = functools.lru_cache(bin.count_primes)
+count_primes = decorators.TimedFunction(bin.count_primes)
 """
 Count the number of primes numbers less than or equal to ``num``.
 
@@ -93,7 +92,7 @@ int
     Number of prime numbers up to and including ``num``.
 """
 
-upper_bound_of_nth_prime = functools.lru_cache(bin.upper_bound_of_nth_prime)
+upper_bound_of_nth_prime = decorators.TimedFunction(bin.upper_bound_of_nth_prime)
 """
 Return the highest possible value of the nth prime.
 
@@ -113,7 +112,7 @@ int
     The upper bound of the ``n``-th prime.
 """
 
-list_n_primes = functools.lru_cache(bin.list_n_primes)
+list_n_primes = decorators.TimedFunction(bin.list_n_primes)
 """
 List the first ``n`` primes.
 
@@ -131,7 +130,7 @@ List[int]
     A :class:`list` of the first ``n`` primes in :class:`int`.
 """
 
-nth_prime = functools.lru_cache(bin.nth_prime)
+nth_prime = decorators.TimedFunction(bin.nth_prime)
 """
 Find the ``n``-th prime.
 
