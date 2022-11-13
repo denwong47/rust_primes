@@ -10,7 +10,7 @@ authors = [
 version = "0.3.0"
 description = "Utilities for prime calculations in Python using Rust backend."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
@@ -42,7 +42,7 @@ lib_rust_primes = ["*"]
 python-source = "src/py"
 
 [tool.isort]
-py_version = 39
+py_version = 38
 profile = "black"
 sections=[
     "FUTURE",
