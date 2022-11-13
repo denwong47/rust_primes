@@ -42,7 +42,7 @@ def get(key: str, modifier: Callable[[str], Any], *, default: Any = None) -> Any
 
     if modifier is bool:
 
-        def modifier(value: str) -> bool:
+        def modifier(value: str) -> bool:  # pylint: disable=function-redefined
             """
             Special bool transform.
             """
@@ -58,7 +58,7 @@ def get(key: str, modifier: Callable[[str], Any], *, default: Any = None) -> Any
 
     try:
         return modifier(_value)
-    except Exception as e:
+    except Exception:  # pylint: disable=broad-except
         return default
 
 

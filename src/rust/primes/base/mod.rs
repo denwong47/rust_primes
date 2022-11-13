@@ -5,9 +5,11 @@ use crate::py_compatibility::enums;
 
 mod sieves;
 pub use sieves::{
+    Sieve,
     Sievable,
     SieveOfAtkin,
-    SieveOfEratosthenes
+    SieveOfEratosthenes,
+    SieveOfEratosthenesThreaded,
 };
 
 /// Determines if a number is a prime number.
@@ -62,19 +64,12 @@ pub fn list_primes(
     ubound:u64,
     n_limit:Option<u64>,
 ) -> Vec<u64>{
-    let sieve = sieve.sieve(ubound);
+    let sieve:Sieve = sieve.sieve(ubound);
 
     // We gather up everything
-    let result = sieve.iter()
-                                    .enumerate()
-                                    .filter(|&(_, &value)| value)
-                                    .map(|(index, _)| index as u64);
-
-    return if let Some(n) = n_limit {
-        result.take(n as usize).collect::<Vec<u64>>()
-    } else {
-        result.collect::<Vec<u64>>()
-    }
+    return sieves::collect(
+        &sieve, n_limit
+    )
 }
 
 /// Return the number of primes within `ubound`.
@@ -83,12 +78,8 @@ pub fn count_primes(
     sieve:enums::SieveMethod,
     ubound:u64,
 ) -> u64{
-    let sieve = sieve.sieve(ubound);
+    let sieve:Sieve = sieve.sieve(ubound);
 
     // We gather up everything
-    let result: u64 =  sieve.iter()
-                            .filter(|&value| *value)
-                            .count() as u64;
-
-    return result;
+    return sieves::count(&sieve);
 }

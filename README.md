@@ -15,6 +15,26 @@ This project includes a Rust binary backend:
     * Environment Definitions
 
 
+## Classes
+
+### Enum `rust_primes.SieveMethod`
+
+Pseudo-Enum class to define method of prime sieving.
+
+A pseudo-Enum class defined in Rust, this class is NOT an instance of the Python
+`enum.Enum` class, even if it behaves mostly in the same way.
+
+This method is `hash`able. `__hash__` is implemented in Rust.
+
+There are currently two members available:
+
+- `SieveMethod.ATKIN`: Modern method, but less well optimised by the compiler;
+  not necessarily more performant.
+- `SieveMethod.ERATOSTHENES`: The ancient method. Using the
+  `ndarray.slice_mut().step` method, the compiler can optimise the inner loop
+  to a close to ``O(n)`` operation. *This is the default.*
+
+
 ## Functions
 
 ### Function `rust_primes.is_prime()`
@@ -25,48 +45,50 @@ This function checks if a given number is a prime number, and
 returns a "bool" indicating the result.
 
 - Parameters:
-    - `*num*` (`int`) – The number to be checked.
+    - `num` (`int`) – The number to be checked.
+    - `method` (`SieveMehthod`) - The method of sieving to be used for finding the
+      primes.
 
 - Returns:
-    - "True" if prime, "False" otherwise.
+    - `True` if prime, `False` otherwise.
 
 - Return type:
-    - bool
+    - `bool`
 
 ### Function `rust_primes.list_primes()`
 
-   - List all primes numbers less than or equal to "num".
+List all primes numbers less than or equal to "num".
 
-   - The result is given in a "List[int]".
+The result is given in a `List[int]`.
 
    - Parameters:
-      - `*num*` (`int`) – The upper bound to be checked.
+      - `num` (`int`) – The upper bound to be checked.
 
    - Returns:
-      - List of all primes, starting from 2, up to and including "num".
+      - List of all primes, starting from 2, up to and including `num`.
 
    - Return type:
-      - List[int]
+      - `List[int]`
 
 ### Function `rust_primes.count_primes()`
 
-   - Count the number of primes numbers less than or equal to "num".
+Count the number of primes numbers less than or equal to "num".
 
-   - The result is given as a "int".
+The result is given as a `int`.
 
    - Parameters:
-      - `*num*` (`int`) – The upper bound to be checked.
+      - `num` (`int`) – The upper bound to be checked.
 
    - Returns:
-      - Number of prime numbers up to and including "num".
+      - Number of prime numbers up to and including `num`.
 
    - Return type:
-      - int
+      - `int`
 
 
-## `rust_primes.bin` module
+# `rust_primes.bin` module
 
-* Alias for `lib_rust_primes` module *
+*Alias for `lib_rust_primes` module*
 
 The backend functions, implemented in Rust.
 

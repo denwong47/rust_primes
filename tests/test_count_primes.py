@@ -25,7 +25,11 @@ import rust_primes
 )
 @pytest.mark.parametrize(
     ["method"],
-    ([rust_primes.SieveMethod.ATKIN], [rust_primes.SieveMethod.ERATOSTHENES]),
+    (
+        [rust_primes.SieveMethod.ATKIN],
+        [rust_primes.SieveMethod.ERATOSTHENES],
+        [rust_primes.SieveMethod.ERATOSTHENES_THREADED],
+    ),
 )
 def test_count_primes(num, method, count):
     """
