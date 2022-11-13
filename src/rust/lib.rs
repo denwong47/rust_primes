@@ -3,18 +3,36 @@
 /// ### by denwong47
 ///
 /// Sample output and runtime on an Apple M1 Pro:
-/// Within the first 1,000,000 numbers, there are 78,498 prime numbers.
-/// Calculating all primes up to 1,000,000 had taken 0.0026658999999999997s.
-/// Validating all primes up to 1,000,000 had taken 0.015052s.
+/// Calculating all primes under 10^4:
+/// - SieveMethod.ATKIN                       : 0.000039s
+/// - SieveMethod.ERATOSTHENES                : 0.000017s
+/// - SieveMethod.ERATOSTHENES_THREADED       : 0.000314s
 ///
-/// Within the first 100,000,000 numbers, there are 5,761,455 prime numbers.
-/// Calculating all primes up to 100,000,000 had taken 0.6158214s.
-/// Validating all primes up to 100,000,000 had taken 4.697561s.
+/// Calculating all primes under 10^5:
+/// - SieveMethod.ATKIN                       : 0.000286s
+/// - SieveMethod.ERATOSTHENES                : 0.000138s
+/// - SieveMethod.ERATOSTHENES_THREADED       : 0.000563s
 ///
-/// NOTE:
-/// Calculations are done threaded;
-/// Validation is done serially, unthreaded.
-
+/// Calculating all primes under 10^6:
+/// - SieveMethod.ATKIN                       : 0.002254s
+/// - SieveMethod.ERATOSTHENES                : 0.001361s
+/// - SieveMethod.ERATOSTHENES_THREADED       : 0.001469s
+///
+/// Calculating all primes under 10^7:
+/// - SieveMethod.ATKIN                       : 0.017580s
+/// - SieveMethod.ERATOSTHENES                : 0.012332s
+/// - SieveMethod.ERATOSTHENES_THREADED       : 0.027807s
+///
+/// Calculating all primes under 10^8:
+/// - SieveMethod.ATKIN                       : 0.457447s
+/// - SieveMethod.ERATOSTHENES                : 0.589925s
+/// - SieveMethod.ERATOSTHENES_THREADED       : 0.217728s
+///
+/// Calculating all primes under 10^9:
+/// - SieveMethod.ATKIN                       : 5.470739s
+/// - SieveMethod.ERATOSTHENES                : 8.565013s
+/// - SieveMethod.ERATOSTHENES_THREADED       : 2.614307s
+///
 
 use pyo3::prelude::*;
 
