@@ -9,6 +9,7 @@ pub use base::{
     Sievable,
     SieveOfAtkin,
     SieveOfEratosthenes,
+    SieveOfEratosthenesThreaded,
 };
 
 pub use formulas::{

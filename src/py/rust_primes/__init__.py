@@ -13,7 +13,7 @@ This project includes a Rust binary backend:
 """
 
 from . import decorators
-from . import lib_rust_primes as bin
+from . import lib_rust_primes as bin  # pylint: disable=redefined-builtin
 
 SieveMethod = bin.SieveMethod
 """
@@ -22,13 +22,18 @@ Pseudo-Enum class to define method of prime sieving.
 A pseudo-Enum class defined in Rust, this class is NOT an instance of the Python
 :class:`enum.Enum` class, even if it behaves mostly in the same way.
 
-There are currently two members available:
+There are currently three members available:
 
 - :attr:`SieveMethod.ATKIN`: Modern method, but less well optimised by the compiler;
   not necessarily more performant.
 - :attr:`SieveMethod.ERATOSTHENES`: The ancient method. Using the
   :meth:`ndarray.slice_mut().step` method, the compiler can optimise the inner loop
   to a close to ``O(n)`` operation. *This is the default.*
+- :attr:`SieveMethod.ERATOSTHENES_THREADED`: *Experimental*. An attempt to introduce
+  threading into :attr:``ERATOSTHENES``. It works by using :attr:`ERATOSTHENES` to
+  create a base array of primes, upto :func:`Math.sqrt` of the upper bound, then
+  split the list of primes into equal size for each worker, then each worker sieve the
+  rest of the (larger) numbers.
 """
 
 is_prime = decorators.TimedFunction(bin.is_prime)

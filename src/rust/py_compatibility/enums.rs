@@ -9,13 +9,15 @@ use crate::primes::{
     Sievable,
     SieveOfAtkin,
     SieveOfEratosthenes,
+    SieveOfEratosthenesThreaded,
 };
 
 #[pyclass(module="rust_primes")]
 #[derive(Copy, Clone, Debug, Hash, EnumIter)]
 pub enum SieveMethod {
     ATKIN,
-    ERATOSTHENES
+    ERATOSTHENES,
+    ERATOSTHENES_THREADED,
 }
 #[pymethods]
 impl SieveMethod {
@@ -35,7 +37,8 @@ impl Sievable for SieveMethod {
     ndarray::ArrayBase<ndarray::OwnedRepr<bool>, ndarray::Dim<[usize; 1]>> {
         return match self {
             Self::ATKIN => SieveOfAtkin::sieve(ubound),
-            Self::ERATOSTHENES => SieveOfEratosthenes::sieve(ubound)
+            Self::ERATOSTHENES => SieveOfEratosthenes::sieve(ubound),
+            Self::ERATOSTHENES_THREADED => SieveOfEratosthenesThreaded::sieve(ubound),
         }
     }
 }

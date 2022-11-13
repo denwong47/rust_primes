@@ -9,6 +9,7 @@ pub use sieves::{
     Sievable,
     SieveOfAtkin,
     SieveOfEratosthenes,
+    SieveOfEratosthenesThreaded,
 };
 
 /// Determines if a number is a prime number.

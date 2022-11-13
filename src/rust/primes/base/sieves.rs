@@ -1,8 +1,17 @@
-use std::{cmp};
-use ndarray::{Array, ArrayBase, Dim, OwnedRepr, s};
+use std::{cmp, thread};
+use std::sync::Arc;
+use ndarray::{ArcArray1, Array, ArrayBase, Dim, OwnedRepr, s};
+use rayon::prelude::*;
 
 pub type Sieve = ArrayBase<OwnedRepr<bool>, Dim<[usize; 1]>>;
 
+pub const BASE_WHEEL_SIZE:u64 = 64;
+pub const MAX_WHEEL_SIZE:u64 = 10_u64.pow(7);
+pub const DEFAULT_WORKERS_PROPORTION:f64 = 1.;
+pub const DEFAULT_WORKERS:usize = 4;
+
+#[allow(unused_imports)]
+use timeit::{timeit_loops};
 // Trait indicating a struct can perform a prime sieve.
 pub trait Sievable {
     // This is NOT implemented below.
@@ -57,13 +66,13 @@ impl SieveOfEratosthenes {
 
         // Build inner wheel
         let sieve = Self::sieve_with_existing(
-            cmp::min(1024, ubound),
+            ubound,
             &Array::from_vec(
-                vec![false, false, true, true, false]
+                vec![false, false, true, true]
             ),
         );
 
-        return Self::sieve_with_existing_iterative(ubound, &sieve);
+        return sieve;
     }
 
     /// Perform the sieve by expanding an existing sieve
@@ -71,12 +80,18 @@ impl SieveOfEratosthenes {
         ubound:u64,
         sieve_input:&Sieve,
     ) -> Sieve {
-        let mut sieve = Self::wheel_from_sieve(ubound, &sieve_input);
+
+        let mut sieve = Array::from_elem(((ubound+1) as usize, ), true);
+
+        {
+            let mut sieve_subset = sieve.slice_mut(s![..cmp::min(sieve_input.len(), sieve.len())]);
+            sieve_subset.assign(&sieve_input.slice(s![..sieve_subset.len()]));
+        }
 
         if sieve.len() > sieve_input.len() {
             for prime in 2..cmp::max(3, ((ubound+1) as f64).sqrt().ceil() as usize) {
                 if sieve[prime] {
-                    if prime as usize*2 >= sieve.len() { break; }
+                    if prime as usize*2 >= sieve.len() { continue; }
 
                     let mut factors = sieve.slice_mut(s![prime*2..; prime]);
 
@@ -88,70 +103,6 @@ impl SieveOfEratosthenes {
         return sieve;
     }
 
-    /// Generate a wheel factorised sieve.
-    /// The remaining numbers in the wheel are mostly prime numbers (they are collectively called "relatively" prime).
-    /// Use sieve_with_existing or further wheel_from_sieve to remove the remaining non-primes.
-    fn wheel_from_sieve(
-        ubound:u64,
-        sieve_input:&Sieve,
-    ) -> Sieve {
-        let mut sieve = Array::from_elem(((ubound+1) as usize, ), true);
-
-        // Replace inner wheel with sieve_input
-        {
-            let mut sieve_subset = sieve.slice_mut(s![..cmp::min(sieve_input.len(), sieve.len())]);
-            sieve_subset.assign(&sieve_input.slice(s![..sieve_subset.len()]));
-        }
-
-        // Work through each slice of the wheel, radiating from the inner wheel.
-        if sieve.len() > sieve_input.len() {
-            // Possible to insert an unsafe block here to thread this - because the slices don't overlap.
-            let primes = collect(&sieve_input, None);
-            let wheel_size = primes.iter().fold(1, |x, y| { x*y }) as usize;
-
-            for prime in primes {
-                if prime as usize + wheel_size >= sieve.len() { break; }
-
-                let mut sieve_slice = sieve.slice_mut(s![prime as usize + wheel_size..; wheel_size]);
-
-                sieve_slice.fill(false);
-            }
-        }
-
-        return sieve;
-    }
-
-    /// Perform the sieve iteratively, maintaining <`max_layers` layers each time.
-    /// This narrows the gaps when the layers are too thick.
-    pub fn sieve_with_existing_iterative(
-        ubound:u64,
-        sieve_input:&Sieve,
-    ) -> Sieve {
-
-        // let n_layers = max_layers.or(Some(DEFAULT_MAX_LAYERS)).unwrap();
-
-        let mut sieve:Sieve = sieve_input.clone(); // Possibly cloning here.
-
-        if sieve.len() < ubound as usize {
-            while sieve.len() < ubound as usize {
-                let sieve_output = Self::sieve_with_existing(
-                    cmp::min(ubound, (sieve.len().pow(2)) as u64),
-                    &sieve,
-                );
-
-                // Swap out the underlying value of sieve.
-                *&mut sieve = sieve_output;
-            };
-        } else{
-            // If the sieve is already less than
-            return Self::sieve_with_existing(
-                ubound,
-                &sieve,
-            );
-        }
-
-        return sieve;
-    }
 }
 
 /// Returns an `ndarray` of `bool` that indicates whether its index is a prime number.
@@ -221,6 +172,144 @@ impl SieveOfAtkin {
             }
 
             r += 1;
+        }
+
+        return sieve;
+    }
+}
+
+
+/// Experiment to make SieveOfEratosthenes threaded using rayon.
+pub struct SieveOfEratosthenesThreaded;
+impl SieveOfEratosthenesThreaded {
+    pub fn sieve(
+        ubound:u64,
+    ) -> ArrayBase<OwnedRepr<bool>, Dim<[usize; 1]>> {
+
+        let base_wheel_size = cmp::min(
+            MAX_WHEEL_SIZE,
+            cmp::max(
+                BASE_WHEEL_SIZE,
+                (ubound as f64).sqrt() as u64,
+            )
+        );
+
+        // Build inner wheel
+        let sieve = SieveOfEratosthenes::sieve(
+            cmp::min(base_wheel_size, ubound),
+        );
+
+        if (ubound+1) as usize == sieve.len() && false {
+            return sieve;
+        } else {
+            return Self::sieve_parallelised(ubound, &sieve);
+        }
+
+    }
+
+    pub fn sieve_parallelised(
+        ubound:u64,
+        sieve_input:&Sieve,
+    ) -> Sieve {
+        if sieve_input.len() < ubound as usize {
+            let mut sieve:Sieve = sieve_input.clone(); // Possibly cloning here.
+
+            while sieve.len() < ubound as usize {
+                // DEBUG PRINT
+                // println!("Sieve loop operation: {}s", timeit_loops!(1, {
+
+                let sieve_output = Self::sieve_sq_chunked(
+                    cmp::min(ubound, (sieve.len().pow(2)-1) as u64),
+                    &sieve,
+                );
+
+                // Swap out the underlying value of sieve.
+                *&mut sieve = sieve_output;
+
+                // DEBUG PRINT
+                // }));
+            };
+
+            return sieve;
+        } else{
+            // If the sieve is already less than
+            return SieveOfEratosthenes::sieve_with_existing(
+                ubound,
+                sieve_input,
+            );
+        }
+
+    }
+
+    pub fn sieve_sq_chunked(
+        ubound:u64,
+        sieve_input:&Sieve,
+    ) -> Sieve {
+        assert!(
+            ubound < sieve_input.len().pow(2) as u64,
+            "sieve_sq_chunked can only be safely used with ubound < sieve_input.len().pow(2); found ubound={:?}, sieve_input.len()={:?}.",
+            ubound,
+            sieve_input.len(),
+        );
+
+        let mut sieve = Array::from_elem(((ubound+1) as usize, ), true);
+
+        // Replace inner wheel with sieve_input
+        {
+            let mut sieve_subset = sieve.slice_mut(s![..cmp::min(sieve_input.len(), sieve.len())]);
+            sieve_subset.assign(&sieve_input.slice(s![..sieve_subset.len()]));
+        }
+
+        if sieve.len() > sieve_input.len() {
+
+            let workers = match thread::available_parallelism() {
+                Ok(count) => (usize::from(count) as f64 * DEFAULT_WORKERS_PROPORTION).ceil() as usize,
+                Err(_) => DEFAULT_WORKERS,
+            };
+
+
+            '_thread_block: {
+                let primes = ArcArray1::from_vec(collect(&sieve_input, None));
+
+                let ubound_arc = Arc::from(ubound);
+
+                // let chunk_size = (primes.len() as f64 / workers as f64).ceil() as usize;
+                // let primes_chunk_iter = primes.axis_chunks_iter(Axis(0), chunk_size).into_par_iter();
+
+                let threads:Vec<Sieve> = (0..workers)
+                    .into_par_iter()
+                    .map(
+                        |worker_id| {
+                            let ubound_ptr = Arc::clone(&ubound_arc);
+                            let prime_slice = primes.slice(s![worker_id..; workers]);
+
+                            let mut sieve = Array::from_elem(((*ubound_ptr+1) as usize,), true);
+
+                            // DEBUG PRINT
+                            // println!("Thread Operation on primes {}: {}s", &prime_slice, timeit_loops!(1, {
+                            for prime in prime_slice {
+                                if *prime as usize*2 < sieve.len() {
+                                    let mut sieve_slice = sieve.slice_mut(s![*prime as usize*2..; *prime as usize]);
+
+                                    sieve_slice.fill(false);
+                                }
+                            };
+                            // DEBUG PRINT
+                            // }));
+
+                            return sieve;
+                        }
+                    )
+                    .collect();
+
+                // DEBUG PRINT
+                // println!("Sqashing all sieve results: {}s", timeit_loops!(1, {
+                for sieve_thread in &threads {
+                    sieve = sieve & sieve_thread;
+                };
+                // DEBUG PRINT
+                // }));
+            }
         }
 
         return sieve;
