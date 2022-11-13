@@ -44,6 +44,9 @@ Parameters
 num : int
     The number to be checked.
 
+method : SieveMethod
+    The method of sieving to be used for finding the primes.
+
 Returns
 -------
 bool
@@ -60,6 +63,9 @@ Parameters
 ----------
 num : int
     The upper bound to be checked.
+
+method : SieveMethod
+    The method of sieving to be used for finding the primes.
 
 Returns
 -------
@@ -78,6 +84,9 @@ Parameters
 num : int
     The upper bound to be checked.
 
+method : SieveMethod
+    The method of sieving to be used for finding the primes.
+
 Returns
 -------
 int
@@ -89,6 +98,9 @@ upper_bound_of_nth_prime = functools.lru_cache(bin.upper_bound_of_nth_prime)
 Return the highest possible value of the nth prime.
 
 The result is given as a :class:`int`.
+
+.. note::
+    This function does NOT have a :attr:`method` parameter.
 
 Parameters
 ----------
@@ -110,6 +122,9 @@ Parameters
 n : int
     The number of primes to return.
 
+method : SieveMethod
+    The method of sieving to be used for finding the primes.
+
 Returns
 -------
 List[int]
@@ -124,6 +139,9 @@ Parameters
 ----------
 n : int
     The ``n``-th prime to return.
+
+method : SieveMethod
+    The method of sieving to be used for finding the primes.
 
 Returns
 -------
