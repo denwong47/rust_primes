@@ -33,13 +33,23 @@ class TimedResult(float):
     result: Any
 
     def __new__(
-        cls, value: Any, *, number: int = 1, result: Any = None
-    ) -> None:  # pylint: disable=unused-argument
+        # pylint: disable-next=unused-argument
+        cls,
+        value: Any,
+        *,
+        number: int = 1,
+        result: Any = None
+    ) -> None:
         return super().__new__(cls, value)
 
     def __init__(
-        self, value: Any, *, number: int = 1, result: Any = None
-    ) -> None:  # pylint: disable=unused-argument
+        # pylint: disable-next=unused-argument
+        self,
+        value: Any,
+        *,
+        number: int = 1,
+        result: Any = None
+    ) -> None:
         super().__init__()
         self.number = number
         self.result = result

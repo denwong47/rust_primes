@@ -1,5 +1,6 @@
+use std::ops::BitAndAssign;
 use std::{cmp, thread};
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use ndarray::{ArcArray1, Array, ArrayBase, Dim, OwnedRepr, s};
 use rayon::prelude::*;
 
@@ -261,6 +262,7 @@ impl SieveOfEratosthenesThreaded {
         }
 
         if sieve.len() > sieve_input.len() {
+            let sieve_mutex = Arc::new(Mutex::new(sieve));
 
             let workers = match thread::available_parallelism() {
                 Ok(count) => (usize::from(count) as f64 * DEFAULT_WORKERS_PROPORTION).ceil() as usize,
@@ -276,20 +278,21 @@ impl SieveOfEratosthenesThreaded {
                 // let chunk_size = (primes.len() as f64 / workers as f64).ceil() as usize;
                 // let primes_chunk_iter = primes.axis_chunks_iter(Axis(0), chunk_size).into_par_iter();
 
-                let threads:Vec<Sieve> = (0..workers)
+                let _threads:Vec<()> = (0..workers)
                     .into_par_iter()
                     .map(
                         |worker_id| {
+                            let sieve_mutex_ref = Arc::clone(&sieve_mutex);
                             let ubound_ptr = Arc::clone(&ubound_arc);
                             let prime_slice = primes.slice(s![worker_id..; workers]);
 
-                            let mut sieve = Array::from_elem(((*ubound_ptr+1) as usize,), true);
+                            let mut sieve_thread = Array::from_elem(((*ubound_ptr+1) as usize,), true);
 
                             // DEBUG PRINT
                             // println!("Thread Operation on primes {}: {}s", &prime_slice, timeit_loops!(1, {
                             for prime in prime_slice {
-                                if *prime as usize*2 < sieve.len() {
-                                    let mut sieve_slice = sieve.slice_mut(s![*prime as usize*2..; *prime as usize]);
+                                if *prime as usize*2 < sieve_thread.len() {
+                                    let mut sieve_slice = sieve_thread.slice_mut(s![*prime as usize*2..; *prime as usize]);
 
                                     sieve_slice.fill(false);
                                 }
@@ -297,21 +300,37 @@ impl SieveOfEratosthenesThreaded {
                             // DEBUG PRINT
                             // }));
 
-                            return sieve;
+                            // DEBUG PRINT
+                            // println!("Mutex block: {}s", timeit_loops!(1, {
+                            '_mutex_block: {
+                                let mut sieve = sieve_mutex_ref.lock().unwrap();
+
+                                sieve.bitand_assign(&sieve_thread);
+                            }
+                            // DEBUG PRINT
+                            // }));
                         }
                     )
                     .collect();
 
                 // DEBUG PRINT
                 // println!("Sqashing all sieve results: {}s", timeit_loops!(1, {
-                for sieve_thread in &threads {
-                    sieve = sieve & sieve_thread;
-                };
+                // for sieve_thread in &threads {
+                //     sieve = sieve & sieve_thread;
+                // };
                 // DEBUG PRINT
                 // }));
             }
+
+            let sieve = Arc::try_unwrap(sieve_mutex)
+                .unwrap()
+                .into_inner()
+                .unwrap();
+            return sieve;
+        } else {
+            return sieve;
         }
 
-        return sieve;
+
     }
 }
