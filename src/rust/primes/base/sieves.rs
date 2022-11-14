@@ -4,7 +4,7 @@ use std::sync::{Arc, Mutex};
 use ndarray::{ArcArray1, Array, ArrayBase, Dim, OwnedRepr, s};
 use rayon::prelude::*;
 
-pub type Sieve = ArrayBase<OwnedRepr<bool>, Dim<[usize; 1]>>;
+pub type Sieve<T> = ArrayBase<T, Dim<[usize; 1]>>;
 
 pub const BASE_WHEEL_SIZE:u64 = 64;
 pub const MAX_WHEEL_SIZE:u64 = 10_u64.pow(7);
@@ -18,15 +18,16 @@ pub trait Sievable {
     // This is NOT implemented below.
     // This is meant for the Enum, which will implement this trait,
     // from which the sieve function will call the Sieves below.
-    fn sieve(&self, ubound:u64) -> Sieve;
+    fn sieve(&self, ubound:u64) -> Sieve<OwnedRepr<bool>>;
 }
 
 /// Collect all the vectors from a Sieve.
 /// Return as a Vec of all the prime integers.
-pub fn collect(
-    sieve: &Sieve,
+pub fn collect<T> (
+    sieve: &Sieve<T>,
     n_limit:Option<u64>,
-) -> Vec<u64> {
+) -> Vec<u64>
+where T:ndarray::Data<Elem=bool> {
     let result = sieve.iter()
                     .enumerate()
                     .filter(|&(_, &value)| value)
@@ -41,9 +42,10 @@ pub fn collect(
 
 /// Count the vectors in a Sieve.
 /// Return as u64.
-pub fn count(
-    sieve: &Sieve,
-) -> u64 {
+pub fn count<T>(
+    sieve: &Sieve<T>,
+) -> u64
+where T:ndarray::Data<Elem=bool> {
     let result: u64 =  sieve.iter()
                             .filter(|&value| *value)
                             .count() as u64;
@@ -77,10 +79,10 @@ impl SieveOfEratosthenes {
     }
 
     /// Perform the sieve by expanding an existing sieve
-    pub fn sieve_with_existing(
+    fn sieve_with_existing(
         ubound:u64,
-        sieve_input:&Sieve,
-    ) -> Sieve {
+        sieve_input:&Sieve<OwnedRepr<bool>>,
+    ) -> Sieve<OwnedRepr<bool>> {
 
         let mut sieve = Array::from_elem(((ubound+1) as usize, ), true);
 
@@ -109,13 +111,13 @@ impl SieveOfEratosthenes {
 /// Returns an `ndarray` of `bool` that indicates whether its index is a prime number.
 /// Private function, used for `list_primes` and `count_primes`.
 ///
-/// Using ndarray, the Sieve of Atkin is the modern method of calculating
+/// Using ndarray, the Sieve<OwnedRepr<bool>> of Atkin is the modern method of calculating
 /// primes.
 pub struct SieveOfAtkin;
 impl SieveOfAtkin {
     pub fn sieve(
         ubound:u64,
-    ) -> Sieve {
+    ) -> Sieve<OwnedRepr<bool>> {
 
         let mut sieve = Array::from_elem(((ubound+1) as usize, ), false);
 
@@ -240,10 +242,10 @@ impl SieveOfEratosthenesThreaded {
 
     fn sieve_parallelised(
         ubound:u64,
-        sieve_input:&Sieve,
-    ) -> Sieve {
+        sieve_input:&Sieve<OwnedRepr<bool>>,
+    ) -> Sieve<OwnedRepr<bool>> {
         if sieve_input.len() < ubound as usize {
-            let mut sieve:Sieve = sieve_input.clone(); // Possibly cloning here.
+            let mut sieve:Sieve<OwnedRepr<bool>> = sieve_input.clone(); // Possibly cloning here.
 
             while sieve.len() < ubound as usize {
                 // DEBUG PRINT
@@ -274,8 +276,8 @@ impl SieveOfEratosthenesThreaded {
 
     fn sieve_chunk(
         ubound:u64,
-        sieve_input:&Sieve,
-    ) -> Sieve {
+        sieve_input:&Sieve<OwnedRepr<bool>>,
+    ) -> Sieve<OwnedRepr<bool>> {
         assert!(
             ubound < sieve_input.len().pow(2) as u64,
             "sieve_chunk can only be safely used with ubound < sieve_input.len().pow(2); found ubound={:?}, sieve_input.len()={:?}.",
@@ -366,5 +368,88 @@ impl SieveOfEratosthenesThreaded {
         }
 
 
+    }
+}
+
+
+
+pub struct WheelFactorisedPrimeCheck;
+impl WheelFactorisedPrimeCheck {
+    pub fn sieve(
+        ubound:u64,
+    ) -> ArrayBase<OwnedRepr<bool>, Dim<[usize; 1]>> {
+
+        // Build inner wheel
+        let sieve = Self::sieve_with_existing(
+            cmp::min(1024, ubound),
+            &Array::from_vec(
+                vec![false, false, true, true, false]
+            ),
+        );
+
+        return Self::sieve_with_existing(ubound, &sieve);
+    }
+
+    /// Perform the sieve by expanding an existing sieve
+    pub fn sieve_with_existing(
+        ubound:u64,
+        sieve_input:&Sieve<OwnedRepr<bool>>,
+    ) -> Sieve<OwnedRepr<bool>> {
+        let mut sieve = Self::wheel_from_sieve(ubound, &sieve_input);
+
+        let primes = ArcArray1::from_vec(collect(&sieve_input, None));
+        let candidates = ArcArray1::from_vec(
+            collect(
+                &sieve.slice(s![sieve_input.len()..]),
+                None
+            )
+        );
+
+        if sieve.len() > sieve_input.len() {
+            for prime in 2..cmp::max(3, ((ubound+1) as f64).sqrt().ceil() as usize) {
+                if sieve[prime] {
+                    if prime as usize*2 >= sieve.len() { break; }
+
+                    let mut factors = sieve.slice_mut(s![prime*2..; prime]);
+
+                    factors.fill(false);
+                }
+            }
+        }
+
+        return sieve;
+    }
+
+    /// Generate a wheel factorised sieve.
+    /// The remaining numbers in the wheel are mostly prime numbers (they are collectively called "relatively" prime).
+    /// Use sieve_with_existing or further wheel_from_sieve to remove the remaining non-primes.
+    fn wheel_from_sieve(
+        ubound:u64,
+        sieve_input:&Sieve<OwnedRepr<bool>>,
+    ) -> Sieve<OwnedRepr<bool>> {
+        let mut sieve = Array::from_elem(((ubound+1) as usize, ), true);
+
+        // Replace inner wheel with sieve_input
+        {
+            let mut sieve_subset = sieve.slice_mut(s![..cmp::min(sieve_input.len(), sieve.len())]);
+            sieve_subset.assign(&sieve_input.slice(s![..sieve_subset.len()]));
+        }
+
+        // Work through each slice of the wheel, radiating from the inner wheel.
+        if sieve.len() > sieve_input.len() {
+            // Possible to insert an unsafe block here to thread this - because the slices don't overlap.
+            let primes = collect(&sieve_input, None);
+            let wheel_size = primes.iter().fold(1, |x, y| { x*y }) as usize;
+
+            for prime in primes {
+                if prime as usize + wheel_size >= sieve.len() { break; }
+
+                let mut sieve_slice = sieve.slice_mut(s![prime as usize + wheel_size..; wheel_size]);
+
+                sieve_slice.fill(false);
+            }
+        }
+
+        return sieve;
     }
 }
