@@ -30,7 +30,14 @@ class TimedResult(float):
     """
 
     number: int
+    """
+    The number of executions run.
+    """
+
     result: Any
+    """
+    The return value of the *last* execution.
+    """
 
     def __new__(
         # pylint: disable-next=unused-argument
@@ -60,6 +67,9 @@ class TimedResult(float):
         Alias for for ``float(self)``.
 
         Returns the duration of execution recorded when this instance initiated.
+
+        .. note::
+            This returns a standard :class:`float` instance.
         """
         return float(self)
 
@@ -84,12 +94,15 @@ class TimedFunction:
 
     def uncached_call(self, *args: Any, **kwargs: Any) -> Any:
         """
-        Call the underlying function without ``lru_cache``.
+        Call the underlying function without :func:`functools.lru_cache`.
 
         Parameters
         ----------
-        *args, **kwargs
+        args
             Parameters to be passed to the underlying function.
+
+        kwargs
+            Keyworded Parameters to be passed to the underlying function.
 
         Returns
         -------
@@ -122,6 +135,11 @@ class TimedFunction:
         """
         Run the underlying function, timed.
 
+        When running :meth:`timed`, the function is always uncached. It will repeat
+        the function call ``number`` of times, and the returned :class:`TimedResult` -
+        which is a subclass of :class:`float`, will be the *TOTAL* time for all the
+        executions.
+
         Parameters
         ----------
         *args, **kwargs
@@ -133,6 +151,10 @@ class TimedFunction:
         Returns
         ------
         TimedResult
+
+
+        .. seealso::
+            :class:`TimedResult` on how to retrieve the result and average run time.
         """
         _duration = timeit(
             # When timing something, do not cache anything.
