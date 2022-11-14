@@ -10,6 +10,7 @@ pub use sieves::{
     SieveOfAtkin,
     SieveOfEratosthenes,
     SieveOfEratosthenesThreaded,
+    // WheelFactorisedPrimeCheck,
 };
 
 /// Determines if a number is a prime number.
@@ -37,7 +38,7 @@ pub fn is_prime(
 /// Private function
 /// This actually do the work of checking primes.
 /// Mandatory: Give it a slice of SORTED prime numbers up to at least sqrt of num.
-fn is_prime_with_known_primes(
+pub fn is_prime_with_known_primes(
     num:u64,
     primes:&[u64],
 ) -> bool {

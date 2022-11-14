@@ -10,6 +10,7 @@ pub use base::{
     SieveOfAtkin,
     SieveOfEratosthenes,
     SieveOfEratosthenesThreaded,
+    // WheelFactorisedPrimeCheck,
 };
 
 pub use formulas::{

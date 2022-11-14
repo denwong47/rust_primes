@@ -1,8 +1,10 @@
 use std::ops::BitAndAssign;
 use std::{cmp, thread};
 use std::sync::{Arc, Mutex};
-use ndarray::{ArcArray1, Array, ArrayBase, Dim, OwnedRepr, s};
+use ndarray::{ArcArray1, Array, ArrayBase, Axis, Dim, OwnedRepr, s};
 use rayon::prelude::*;
+
+// use crate::primes::base::is_prime_with_known_primes;
 
 pub type Sieve<T> = ArrayBase<T, Dim<[usize; 1]>>;
 
@@ -372,84 +374,147 @@ impl SieveOfEratosthenesThreaded {
 }
 
 
+// /// THIS DOES NOT WORK.
+// /// WE MISUNDERSTOOD WHEEL OF FACTORISATION.
+// /// MORE WORK NEEDED.
+// pub struct WheelFactorisedPrimeCheck;
+// impl WheelFactorisedPrimeCheck {
+//     pub fn sieve(
+//         ubound:u64,
+//     ) -> ArrayBase<OwnedRepr<bool>, Dim<[usize; 1]>> {
 
-pub struct WheelFactorisedPrimeCheck;
-impl WheelFactorisedPrimeCheck {
-    pub fn sieve(
-        ubound:u64,
-    ) -> ArrayBase<OwnedRepr<bool>, Dim<[usize; 1]>> {
+//         // Build inner wheel
+//         let sieve = SieveOfAtkin::sieve(
+//             cmp::min(5, ubound),
+//         );
 
-        // Build inner wheel
-        let sieve = Self::sieve_with_existing(
-            cmp::min(1024, ubound),
-            &Array::from_vec(
-                vec![false, false, true, true, false]
-            ),
-        );
+//         return Self::prime_check_with_wheel(ubound, &sieve);
+//     }
 
-        return Self::sieve_with_existing(ubound, &sieve);
-    }
+//     /// Perform the sieve by expanding an existing sieve
+//     pub fn prime_check_with_wheel(
+//         ubound:u64,
+//         sieve_input:&Sieve<OwnedRepr<bool>>,
+//     ) -> Sieve<OwnedRepr<bool>> {
+//         let sieve = Self::wheel_from_sieve(ubound, &sieve_input);
 
-    /// Perform the sieve by expanding an existing sieve
-    pub fn sieve_with_existing(
-        ubound:u64,
-        sieve_input:&Sieve<OwnedRepr<bool>>,
-    ) -> Sieve<OwnedRepr<bool>> {
-        let mut sieve = Self::wheel_from_sieve(ubound, &sieve_input);
+//         assert!(
+//             ubound < sieve.len().pow(2) as u64,
+//             "prime_check_with_wheel can only be safely used with ubound < (product of all known primes)^2; found ubound={:?}, sieve.len()={:?}.",
+//             ubound,
+//             sieve.len(),
+//         );
 
-        let primes = ArcArray1::from_vec(collect(&sieve_input, None));
-        let candidates = ArcArray1::from_vec(
-            collect(
-                &sieve.slice(s![sieve_input.len()..]),
-                None
-            )
-        );
+//         if sieve.len() > sieve_input.len() {
+//             let primes = collect(&sieve_input, None);
+//             let candidates = ArcArray1::from_vec(
+//                 collect(
+//                     &sieve.slice(s![sieve_input.len()..]),
+//                     None
+//                 )
+//             ) + sieve_input.len() as u64;
 
-        if sieve.len() > sieve_input.len() {
-            for prime in 2..cmp::max(3, ((ubound+1) as f64).sqrt().ceil() as usize) {
-                if sieve[prime] {
-                    if prime as usize*2 >= sieve.len() { break; }
+//             println!("Primes {:?}", &primes);
+//             println!("Sieve {:?}", &sieve);
+//             println!("Candidates {:?}", &candidates);
 
-                    let mut factors = sieve.slice_mut(s![prime*2..; prime]);
+//             let sieve_mutex = Arc::new(Mutex::new(sieve));
 
-                    factors.fill(false);
-                }
-            }
-        }
+//             let workers = match thread::available_parallelism() {
+//                 Ok(count) => (usize::from(count) as f64 * DEFAULT_WORKERS_PROPORTION).ceil() as usize,
+//                 Err(_) => DEFAULT_WORKERS,
+//             };
 
-        return sieve;
-    }
+//             let primes_arc = Arc::new(primes);
 
-    /// Generate a wheel factorised sieve.
-    /// The remaining numbers in the wheel are mostly prime numbers (they are collectively called "relatively" prime).
-    /// Use sieve_with_existing or further wheel_from_sieve to remove the remaining non-primes.
-    fn wheel_from_sieve(
-        ubound:u64,
-        sieve_input:&Sieve<OwnedRepr<bool>>,
-    ) -> Sieve<OwnedRepr<bool>> {
-        let mut sieve = Array::from_elem(((ubound+1) as usize, ), true);
+//             let chunk_size = (candidates.len() as f64 / workers as f64).ceil() as usize;
 
-        // Replace inner wheel with sieve_input
-        {
-            let mut sieve_subset = sieve.slice_mut(s![..cmp::min(sieve_input.len(), sieve.len())]);
-            sieve_subset.assign(&sieve_input.slice(s![..sieve_subset.len()]));
-        }
+//             /*'_thread_block:*/ {
+//                 let _threads: Vec<()> = candidates
+//                     .axis_chunks_iter(Axis(0), chunk_size)
+//                     .into_par_iter().map(
+//                         | candidates_chunk | {
+//                             let sieve_mutex_ref = Arc::clone(&sieve_mutex);
+//                             let primes_ptr = Arc::clone(&primes_arc);
 
-        // Work through each slice of the wheel, radiating from the inner wheel.
-        if sieve.len() > sieve_input.len() {
-            // Possible to insert an unsafe block here to thread this - because the slices don't overlap.
-            let primes = collect(&sieve_input, None);
-            let wheel_size = primes.iter().fold(1, |x, y| { x*y }) as usize;
+//                             let mut non_primes = Vec::new();
 
-            for prime in primes {
-                if prime as usize + wheel_size >= sieve.len() { break; }
+//                             for candidate in candidates_chunk {
+//                                 if !is_prime_with_known_primes(*candidate, &primes_ptr) {
+//                                     non_primes.push(*candidate);
+//                                 }
+//                             }
 
-                let mut sieve_slice = sieve.slice_mut(s![prime as usize + wheel_size..; wheel_size]);
+//                             /*'_mutex_block:*/ {
+//                                 let mut sieve = sieve_mutex_ref.lock().unwrap();
 
-                sieve_slice.fill(false);
-            }
-        }
+//                                 for non_prime in non_primes {
+//                                     sieve[non_prime as usize] = false;
+//                                 }
+//                             }
+//                         }
+//                     )
+//                     .collect();
+//             }
 
-        return sieve;
-    }
-}
+//             let sieve = Arc::try_unwrap(sieve_mutex)
+//                 .unwrap()
+//                 .into_inner()
+//                 .unwrap();
+
+//             println!("{}", count(&sieve));
+
+//             return sieve;
+//         } else {
+//             return sieve;
+//         }
+//     }
+
+//     /// Generate a wheel factorised sieve.
+//     /// The remaining numbers in the wheel are mostly prime numbers (they are collectively called "relatively" prime).
+//     /// Use sieve_with_existing or further wheel_from_sieve to remove the remaining non-primes.
+//     fn wheel_from_sieve(
+//         ubound:u64,
+//         sieve_input:&Sieve<OwnedRepr<bool>>,
+//     ) -> Sieve<OwnedRepr<bool>> {
+//         let mut sieve = Array::from_elem(((ubound+1) as usize, ), true);
+
+//         // Work through each slice of the wheel, radiating from the inner wheel.
+//         if sieve.len() > sieve_input.len() {
+//             // Possible to insert an unsafe block here to thread this - because the slices don't overlap.
+//             let input_primes = collect(&sieve_input, None);
+//             let wheel_size = input_primes.iter().fold(1, |x, y| { x*y }) as usize;
+
+//             // Use Atkin to generate the inner wheel
+//             let inner_wheel = SieveOfAtkin::sieve(wheel_size as u64);
+
+//             for factor in 0..wheel_size+1 {
+//                 let lbound  = if inner_wheel[factor as usize]
+//                                         && factor >=2 {
+//                     // If prime, we start with prime + wheel_size
+//                     // to avoid setting the prime to false.
+//                     factor as usize + wheel_size
+//                 } else {
+//                     // If not prime, we start from the factor itself
+//                     factor as usize
+//                 };
+
+//                 if lbound >= sieve.len() { continue; }
+
+//                 let mut sieve_slice = sieve.slice_mut(s![lbound..; wheel_size]);
+
+//                 sieve_slice.fill(false);
+//             }
+//         } else {
+//             // Replace inner wheel with sieve_input
+//             {
+//                 let mut sieve_subset = sieve.slice_mut(s![..cmp::min(sieve_input.len(), sieve.len())]);
+//                 sieve_subset.assign(&sieve_input.slice(s![..sieve_subset.len()]));
+//             }
+//         }
+
+//         println!("{:?}", collect(&sieve, None));
+
+//         return sieve;
+//     }
+// }
