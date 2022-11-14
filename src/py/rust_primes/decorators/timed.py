@@ -84,6 +84,43 @@ class TimedResult(float):
 class TimedFunction:
     """
     Decorator to add a `timed` method to the function.
+
+    When decorated, functions have additional method calls that allows different
+    behaviours::
+
+        >>> import rust_primes
+
+        >>> # Normal function call
+        >>> rust_primes.count_primes(1000)
+        ... 168
+
+        >>> # If we make the same call again, the answer is cached this time
+        >>> rust_primes.count_primes(1000)
+        ... 168
+
+        >>> # Timed function call
+        >>> # While it does not look like it, the actual returned value is a TimedResult
+        ...   object. It is a subclass of float which is what is displayed here,
+        ...   but it also contains the return value etc.
+        >>> # All parameters will be passed through to the underlying function.
+        >>> _result = rust_primes.count_primes.timed(1000)
+        >>> _result
+        ... 1.360991392284632e-06
+
+        >>> _result.result
+        >>> 168
+
+        >>> # Additional parameters
+        >>> # `number` can be specified to state how many times the exeuction should be
+        ...   run and timed.
+        >>> _result = rust_primes.count_primes.timed(1000, number=10)
+        ... 0.0016299039998557419
+
+        >>> # Average run time
+        >>> _result.avg
+        ... 1.461696985643357e-06
+
+
     """
 
     _func: ClassVar[Callable]
