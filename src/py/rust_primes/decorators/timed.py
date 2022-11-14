@@ -99,7 +99,7 @@ class TimedFunction:
         ... 168
 
         >>> # Timed function call
-        >>> # While it does not look like it, the actual returned value is a TimedResult
+        >>> # While it does not look like it, the actual returned value is a TimedResult
         ...   object. It is a subclass of float which is what is displayed here,
         ...   but it also contains the return value etc.
         >>> # All parameters will be passed through to the underlying function.
@@ -111,7 +111,7 @@ class TimedFunction:
         >>> 168
 
         >>> # Additional parameters
-        >>> # `number` can be specified to state how many times the exeuction should be
+        >>> # `number` can be specified to state how many times the exeuction should be
         ...   run and timed.
         >>> _result = rust_primes.count_primes.timed(1000, number=10)
         ... 0.0016299039998557419
