@@ -13,6 +13,7 @@ Subpackages
    :maxdepth: 4
 
    rust_primes.config
+   rust_primes.decorators
 
 Submodules
 ----------

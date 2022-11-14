@@ -43,6 +43,14 @@ Check if the given number is prime.
 This function checks if a given number is a prime number, and returns a :class:`bool`
 indicating the result.
 
+.. seealso::
+    While this function behaves like a function, it is implemented through
+    :class:`~rust_primes.decorators.timed.TimedFunction` and thus contains additional
+    functionalities with caching and
+    :meth:`~rust_primes.decorators.timed.TimedFunction.timed` executions.
+
+    See :class:`rust_primes.decorators.timed.TimedFunction` for more details.
+
 Parameters
 ----------
 num : int
@@ -63,6 +71,14 @@ List all primes numbers less than or equal to ``num``.
 
 The result is given in a ``List[int]``.
 
+.. seealso::
+    While this function behaves like a function, it is implemented through
+    :class:`~rust_primes.decorators.timed.TimedFunction` and thus contains additional
+    functionalities with caching and
+    :meth:`~rust_primes.decorators.timed.TimedFunction.timed` executions.
+
+    See :class:`rust_primes.decorators.timed.TimedFunction` for more details.
+
 Parameters
 ----------
 num : int
@@ -82,6 +98,14 @@ count_primes = decorators.TimedFunction(bin.count_primes)
 Count the number of primes numbers less than or equal to ``num``.
 
 The result is given as a :class:`int`.
+
+.. seealso::
+    While this function behaves like a function, it is implemented through
+    :class:`~rust_primes.decorators.timed.TimedFunction` and thus contains additional
+    functionalities with caching and
+    :meth:`~rust_primes.decorators.timed.TimedFunction.timed` executions.
+
+    See :class:`rust_primes.decorators.timed.TimedFunction` for more details.
 
 Parameters
 ----------
@@ -106,6 +130,14 @@ The result is given as a :class:`int`.
 .. note::
     This function does NOT have a :attr:`method` parameter.
 
+.. seealso::
+    While this function behaves like a function, it is implemented through
+    :class:`~rust_primes.decorators.timed.TimedFunction` and thus contains additional
+    functionalities with caching and
+    :meth:`~rust_primes.decorators.timed.TimedFunction.timed` executions.
+
+    See :class:`rust_primes.decorators.timed.TimedFunction` for more details.
+
 Parameters
 ----------
 n : int
@@ -120,6 +152,14 @@ int
 list_n_primes = decorators.TimedFunction(bin.list_n_primes)
 """
 List the first ``n`` primes.
+
+.. seealso::
+    While this function behaves like a function, it is implemented through
+    :class:`~rust_primes.decorators.timed.TimedFunction` and thus contains additional
+    functionalities with caching and
+    :meth:`~rust_primes.decorators.timed.TimedFunction.timed` executions.
+
+    See :class:`rust_primes.decorators.timed.TimedFunction` for more details.
 
 Parameters
 ----------
@@ -138,6 +178,14 @@ List[int]
 nth_prime = decorators.TimedFunction(bin.nth_prime)
 """
 Find the ``n``-th prime.
+
+.. seealso::
+    While this function behaves like a function, it is implemented through
+    :class:`~rust_primes.decorators.timed.TimedFunction` and thus contains additional
+    functionalities with caching and
+    :meth:`~rust_primes.decorators.timed.TimedFunction.timed` executions.
+
+    See :class:`rust_primes.decorators.timed.TimedFunction` for more details.
 
 Parameters
 ----------

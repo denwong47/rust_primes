@@ -1,5 +1,5 @@
 use std::vec::{Vec};
-
+use ndarray::{OwnedRepr};
 
 use crate::py_compatibility::enums;
 
@@ -10,6 +10,7 @@ pub use sieves::{
     SieveOfAtkin,
     SieveOfEratosthenes,
     SieveOfEratosthenesThreaded,
+    // WheelFactorisedPrimeCheck,
 };
 
 /// Determines if a number is a prime number.
@@ -37,7 +38,7 @@ pub fn is_prime(
 /// Private function
 /// This actually do the work of checking primes.
 /// Mandatory: Give it a slice of SORTED prime numbers up to at least sqrt of num.
-fn is_prime_with_known_primes(
+pub fn is_prime_with_known_primes(
     num:u64,
     primes:&[u64],
 ) -> bool {
@@ -64,7 +65,7 @@ pub fn list_primes(
     ubound:u64,
     n_limit:Option<u64>,
 ) -> Vec<u64>{
-    let sieve:Sieve = sieve.sieve(ubound);
+    let sieve:Sieve<OwnedRepr<bool>> = sieve.sieve(ubound);
 
     // We gather up everything
     return sieves::collect(
@@ -78,7 +79,7 @@ pub fn count_primes(
     sieve:enums::SieveMethod,
     ubound:u64,
 ) -> u64{
-    let sieve:Sieve = sieve.sieve(ubound);
+    let sieve:Sieve<OwnedRepr<bool>> = sieve.sieve(ubound);
 
     // We gather up everything
     return sieves::count(&sieve);

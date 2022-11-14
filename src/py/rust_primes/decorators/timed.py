@@ -30,7 +30,14 @@ class TimedResult(float):
     """
 
     number: int
+    """
+    The number of executions run.
+    """
+
     result: Any
+    """
+    The return value of the *last* execution.
+    """
 
     def __new__(
         # pylint: disable-next=unused-argument
@@ -60,6 +67,9 @@ class TimedResult(float):
         Alias for for ``float(self)``.
 
         Returns the duration of execution recorded when this instance initiated.
+
+        .. note::
+            This returns a standard :class:`float` instance.
         """
         return float(self)
 
@@ -74,6 +84,43 @@ class TimedResult(float):
 class TimedFunction:
     """
     Decorator to add a `timed` method to the function.
+
+    When decorated, functions have additional method calls that allows different
+    behaviours::
+
+        >>> import rust_primes
+
+        >>> # Normal function call
+        >>> rust_primes.count_primes(1000)
+        ... 168
+
+        >>> # If we make the same call again, the answer is cached this time
+        >>> rust_primes.count_primes(1000)
+        ... 168
+
+        >>> # Timed function call
+        >>> # While it does not look like it, the actual returned value is a TimedResult
+        ...   object. It is a subclass of float which is what is displayed here,
+        ...   but it also contains the return value etc.
+        >>> # All parameters will be passed through to the underlying function.
+        >>> _result = rust_primes.count_primes.timed(1000)
+        >>> _result
+        ... 1.360991392284632e-06
+
+        >>> _result.result
+        >>> 168
+
+        >>> # Additional parameters
+        >>> # `number` can be specified to state how many times the exeuction should be
+        ...   run and timed.
+        >>> _result = rust_primes.count_primes.timed(1000, number=10)
+        ... 0.0016299039998557419
+
+        >>> # Average run time
+        >>> _result.avg
+        ... 1.461696985643357e-06
+
+
     """
 
     _func: ClassVar[Callable]
@@ -84,12 +131,15 @@ class TimedFunction:
 
     def uncached_call(self, *args: Any, **kwargs: Any) -> Any:
         """
-        Call the underlying function without ``lru_cache``.
+        Call the underlying function without :func:`functools.lru_cache`.
 
         Parameters
         ----------
-        *args, **kwargs
+        args
             Parameters to be passed to the underlying function.
+
+        kwargs
+            Keyworded Parameters to be passed to the underlying function.
 
         Returns
         -------
@@ -122,6 +172,11 @@ class TimedFunction:
         """
         Run the underlying function, timed.
 
+        When running :meth:`timed`, the function is always uncached. It will repeat
+        the function call ``number`` of times, and the returned :class:`TimedResult` -
+        which is a subclass of :class:`float`, will be the *TOTAL* time for all the
+        executions.
+
         Parameters
         ----------
         *args, **kwargs
@@ -133,6 +188,10 @@ class TimedFunction:
         Returns
         ------
         TimedResult
+
+
+        .. seealso::
+            :class:`TimedResult` on how to retrieve the result and average run time.
         """
         _duration = timeit(
             # When timing something, do not cache anything.

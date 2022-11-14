@@ -10,7 +10,7 @@ Welcome to Geodistance Calculations's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   modules
+   rust_primes
 
 
 

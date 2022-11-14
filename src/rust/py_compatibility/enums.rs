@@ -10,6 +10,7 @@ use crate::primes::{
     SieveOfAtkin,
     SieveOfEratosthenes,
     SieveOfEratosthenesThreaded,
+    // WheelFactorisedPrimeCheck,
 };
 
 #[pyclass(module="rust_primes")]
@@ -20,6 +21,7 @@ pub enum SieveMethod {
     ATKIN,
     ERATOSTHENES,
     ERATOSTHENES_THREADED,
+    // WHEEL_FACTORISED_PRIME_CHECK,
 }
 #[pymethods]
 impl SieveMethod {
@@ -41,6 +43,7 @@ impl Sievable for SieveMethod {
             Self::ATKIN => SieveOfAtkin::sieve(ubound),
             Self::ERATOSTHENES => SieveOfEratosthenes::sieve(ubound),
             Self::ERATOSTHENES_THREADED => SieveOfEratosthenesThreaded::sieve(ubound),
+            // Self::WHEEL_FACTORISED_PRIME_CHECK => WheelFactorisedPrimeCheck::sieve(ubound),
         }
     }
 }
