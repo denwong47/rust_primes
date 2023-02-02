@@ -1,9 +1,4 @@
-.. Geodistance Calculations documentation master file, created by
-   sphinx-quickstart on Sun Oct 16 14:18:55 2022.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Welcome to Geodistance Calculations's documentation!
+Welcome to Prime Utilities's documentation!
 ====================================================
 
 .. toctree::
