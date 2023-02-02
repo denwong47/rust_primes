@@ -1,5 +1,7 @@
 # rust_primes
 
+![CI Checks](https://github.com/denwong47/rust_primes/actions/workflows/CI.yml/badge.svg?branch=main)
+
 Utilities for prime calculations in Python using Rust backend.
 
 This project includes a Rust binary backend:

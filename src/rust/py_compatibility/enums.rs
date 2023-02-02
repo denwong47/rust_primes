@@ -13,7 +13,7 @@ use crate::primes::{
     // WheelFactorisedPrimeCheck,
 };
 
-#[pyclass(module="rust_primes")]
+#[pyclass(module = "rust_primes")]
 #[derive(Copy, Clone, Debug, Hash, EnumIter)]
 #[allow(non_camel_case_types)]
 pub enum SieveMethod {
@@ -37,13 +37,15 @@ impl Default for SieveMethod {
     }
 }
 impl Sievable for SieveMethod {
-    fn sieve(&self, ubound:u64) ->
-    ndarray::ArrayBase<ndarray::OwnedRepr<bool>, ndarray::Dim<[usize; 1]>> {
+    fn sieve(
+        &self,
+        ubound: u64,
+    ) -> ndarray::ArrayBase<ndarray::OwnedRepr<bool>, ndarray::Dim<[usize; 1]>> {
         return match self {
             Self::ATKIN => SieveOfAtkin::sieve(ubound),
             Self::ERATOSTHENES => SieveOfEratosthenes::sieve(ubound),
             Self::ERATOSTHENES_THREADED => SieveOfEratosthenesThreaded::sieve(ubound),
             // Self::WHEEL_FACTORISED_PRIME_CHECK => WheelFactorisedPrimeCheck::sieve(ubound),
-        }
+        };
     }
 }
