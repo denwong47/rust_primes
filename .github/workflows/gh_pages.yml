@@ -22,7 +22,7 @@ jobs:
       with:
         manylinux: auto
         command: build
-        args: --release -o dist --find-interpreter
+        args: --release -o dist --interpreter $(which python3.9)
     - name: Pip install
       run: |
         python -m pip install --upgrade pip
