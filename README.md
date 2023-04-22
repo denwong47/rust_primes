@@ -2,6 +2,10 @@
 
 ![CI Checks](https://github.com/denwong47/rust_primes/actions/workflows/CI.yml/badge.svg?branch=main)
 
+> ## **Documentation**:
+>
+> **Available at [github pages](https://denwong47.github.io/rust_primes/).**
+
 Utilities for prime calculations in Python using Rust backend.
 
 This project includes a Rust binary backend:

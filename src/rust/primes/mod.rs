@@ -1,14 +1,11 @@
-pub mod base;
+pub mod constructs;
 pub mod formulas;
+pub(crate) mod methods;
 
-pub use base::{
-    count_primes,
-
-    is_prime,
-    list_primes,
-    Sievable,
+pub use methods::{
     SieveOfAtkin,
     SieveOfEratosthenes,
+    SieveOfEratosthenesAtomic,
     SieveOfEratosthenesThreaded,
     // WheelFactorisedPrimeCheck,
 };
