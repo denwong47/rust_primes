@@ -30,7 +30,7 @@ jobs:
     - name: Build HTML
       # uses: ammaraskar/sphinx-action@master
       run: |
-        cd docs; make html -e; cd ..
+        make docs_build
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
