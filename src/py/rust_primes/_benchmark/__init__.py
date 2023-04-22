@@ -30,6 +30,7 @@ def run(
             SieveMethod.ATKIN,
             SieveMethod.ERATOSTHENES,
             SieveMethod.ERATOSTHENES_THREADED,
+            SieveMethod.ERATOSTHENES_ATOMIC,
         ):
             print(
                 f"- {str(method):40}: "

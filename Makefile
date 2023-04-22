@@ -26,6 +26,7 @@ docs_rebuild_only:
 
 docs_build:
 	cd docs; make html; make text
+	cargo doc --no-deps --target-dir docs/build/html/lib
 
 docs_rebuild: docs_rebuild_only docs_build
 

@@ -1,19 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-=============
- rust_primes
-=============
-
 Utilities for prime calculations in Python using Rust backend.
 
 This project includes a Rust binary backend:
 
 - :mod:`lib_rust_primes` which can be loaded as
-  :attr:`~rust_primes.bin`.
+  ``from rust_primes import bin``.
 """
 
 from . import decorators
-from . import lib_rust_primes as bin  # pylint: disable=redefined-builtin
+from . import lib_rust_primes as bin  # pylint: disable=redefined-builtin # type: ignore
 
 SieveMethod = bin.SieveMethod
 """
@@ -28,7 +24,10 @@ There are currently three members available:
   not necessarily more performant.
 - :attr:`SieveMethod.ERATOSTHENES`: The ancient method. Using the
   :meth:`ndarray.slice_mut().step` method, the compiler can optimise the inner loop
-  to a close to ``O(n)`` operation. *This is the default.*
+  to a close to ``O(n)`` operation.
+- :attr:`SieveMethod.ERATOSTHENES_ATOMIC`: Same method as :attr:`ERATOSTHENES`, but
+  conducted on an array of Atomic booleans instead. Allows threading to run without
+  much overhead. *This is the default.*
 - :attr:`SieveMethod.ERATOSTHENES_THREADED`: *Experimental*. An attempt to introduce
   threading into :attr:``ERATOSTHENES``. It works by using :attr:`ERATOSTHENES` to
   create a base array of primes, upto :func:`Math.sqrt` of the upper bound, then
@@ -69,7 +68,10 @@ list_primes = decorators.TimedFunction(bin.list_primes)
 """
 List all primes numbers less than or equal to ``num``.
 
-The result is given in a ``List[int]``.
+The result is given in a ``List[int]``. Due to the FFI exchange of data between
+Rust and Python, this function will be somewhat slower than the
+:func:`count_primes` implementation. If you intend to ``len(list_primes(n))``,
+use :func:`count_primes` instead.
 
 .. seealso::
     While this function behaves like a function, it is implemented through

@@ -1,5 +1,4 @@
-use crate::primes::list_primes;
-use crate::py_compatibility::enums;
+use crate::{primes::constructs::CanSieve, py_compatibility::enums};
 
 /// Find the mathematical upper bound of the nth prime.
 pub fn upper_bound_of_nth_prime(n: u64) -> u64 {
@@ -41,7 +40,7 @@ fn upper_bound_of_nth_prime_rosser_schoenfeld_1962(n: u64) -> u64 {
 pub fn list_n_primes(sieve: enums::SieveMethod, n: u64) -> Vec<u64> {
     let ubound = upper_bound_of_nth_prime(n);
 
-    return list_primes(sieve, ubound, Some(n));
+    return sieve.list_primes(ubound, Some(n));
 }
 
 /// Return the nth prime.
