@@ -68,10 +68,12 @@ pub mod prelude {
 /// The difference is that `is_prime_with_known_primes` requires a list of all known primes to be passed to it, up to and including the `sqrt` of the number itself.
 /// `is_prime` will enquire that list using `list_primes` first, before calling `is_prime_with_known_primes`.
 #[pyfunction(num, "*", method)]
-fn is_prime(num: u64, method: Option<&enums::SieveMethod>) -> PyResult<bool> {
-    Ok(method
-        .unwrap_or(&enums::SieveMethod::default())
-        .is_prime(num))
+fn is_prime(py: Python<'_>, num: u64, method: Option<&enums::SieveMethod>) -> PyResult<bool> {
+    py.allow_threads(move || {
+        Ok(method
+            .unwrap_or(&enums::SieveMethod::default())
+            .is_prime(num))
+    })
 }
 
 /// Rust library function.
@@ -79,10 +81,16 @@ fn is_prime(num: u64, method: Option<&enums::SieveMethod>) -> PyResult<bool> {
 /// List all the primes within `num`.
 /// Calls `prime_mask`, and apply the mask on `enumerate`.
 #[pyfunction(num, "*", method)]
-fn list_primes(num: u64, method: Option<&enums::SieveMethod>) -> PyResult<Vec<u64>> {
-    Ok(method
-        .unwrap_or(&enums::SieveMethod::default())
-        .list_primes(num, None))
+fn list_primes(
+    py: Python<'_>,
+    num: u64,
+    method: Option<&enums::SieveMethod>,
+) -> PyResult<Vec<u64>> {
+    py.allow_threads(move || {
+        Ok(method
+            .unwrap_or(&enums::SieveMethod::default())
+            .list_primes(num, None))
+    })
 }
 
 /// Rust library function.
@@ -90,10 +98,12 @@ fn list_primes(num: u64, method: Option<&enums::SieveMethod>) -> PyResult<Vec<u6
 /// Return the number of primes within `num`.
 /// Calls `prime_mask`, and filter it by `true` before getting its `len`.
 #[pyfunction(num, "*", method)]
-fn count_primes(num: u64, method: Option<&enums::SieveMethod>) -> PyResult<u64> {
-    Ok(method
-        .unwrap_or(&enums::SieveMethod::default())
-        .count_primes(num))
+fn count_primes(py: Python<'_>, num: u64, method: Option<&enums::SieveMethod>) -> PyResult<u64> {
+    py.allow_threads(move || {
+        Ok(method
+            .unwrap_or(&enums::SieveMethod::default())
+            .count_primes(num))
+    })
 }
 
 /// Rust library function.
@@ -108,22 +118,34 @@ fn upper_bound_of_nth_prime(n: u64) -> PyResult<u64> {
 ///
 /// List the first `n` primes.
 #[pyfunction(num, "*", method)]
-fn list_n_primes(n: u64, method: Option<&enums::SieveMethod>) -> PyResult<Vec<u64>> {
-    Ok(primes::list_n_primes(
-        *method.unwrap_or(&enums::SieveMethod::default()),
-        n,
-    ))
+fn list_n_primes(
+    py: Python<'_>,
+    n: u64,
+    method: Option<&enums::SieveMethod>,
+) -> PyResult<Vec<u64>> {
+    py.allow_threads(move || {
+        let ubound = primes::upper_bound_of_nth_prime(n);
+
+        Ok(method
+            .unwrap_or(&enums::SieveMethod::default())
+            .list_primes(ubound, Some(n)))
+    })
 }
 
 /// Rust library function.
 ///
 /// List the first `n` primes.
 #[pyfunction(num, "*", method)]
-fn nth_prime(n: u64, method: Option<&enums::SieveMethod>) -> PyResult<Option<u64>> {
-    Ok(primes::nth_prime(
-        *method.unwrap_or(&enums::SieveMethod::default()),
-        n,
-    ))
+fn nth_prime(py: Python<'_>, n: u64, method: Option<&enums::SieveMethod>) -> PyResult<Option<u64>> {
+    py.allow_threads(move || {
+        let ubound = primes::upper_bound_of_nth_prime(n);
+
+        Ok(method
+            .unwrap_or(&enums::SieveMethod::default())
+            .list_primes(ubound, Some(n))
+            .last()
+            .map(|i| *i))
+    })
 }
 
 /// A Python module implemented in Rust.

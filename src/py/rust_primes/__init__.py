@@ -42,6 +42,12 @@ Check if the given number is prime.
 This function checks if a given number is a prime number, and returns a :class:`bool`
 indicating the result.
 
+.. note::
+    The GIL is released during calculation, so other Python threads can continue with
+    their work. This tends to have minimal impact on multi-threaded methods, since all
+    the threads are working already; but this could provide better utilisation for
+    single threaded methods.
+
 .. seealso::
     While this function behaves like a function, it is implemented through
     :class:`~rust_primes.decorators.timed.TimedFunction` and thus contains additional
@@ -73,6 +79,12 @@ Rust and Python, this function will be somewhat slower than the
 :func:`count_primes` implementation. If you intend to ``len(list_primes(n))``,
 use :func:`count_primes` instead.
 
+.. note::
+    The GIL is released during calculation, so other Python threads can continue with
+    their work. This tends to have minimal impact on multi-threaded methods, since all
+    the threads are working already; but this could provide better utilisation for
+    single threaded methods.
+
 .. seealso::
     While this function behaves like a function, it is implemented through
     :class:`~rust_primes.decorators.timed.TimedFunction` and thus contains additional
@@ -93,6 +105,16 @@ Returns
 -------
 List[int]
     List of all primes, starting from 2, up to and including ``num``.
+
+Examples
+--------
+List all the primes up to 20 using various methods:
+
+    >>> from rust_primes import SieveMethod, list_primes
+    >>> list_primes(20) # defaults to multi-threaded atomic sieving
+    [2, 3, 5, 7, 11, 13, 17, 19]
+    >>> list_primes(20, method=SieveMethod.ATKIN) # use Atkin's sieve
+    [2, 3, 5, 7, 11, 13, 17, 19]
 """
 
 count_primes = decorators.TimedFunction(bin.count_primes)
@@ -100,6 +122,12 @@ count_primes = decorators.TimedFunction(bin.count_primes)
 Count the number of primes numbers less than or equal to ``num``.
 
 The result is given as a :class:`int`.
+
+.. note::
+    The GIL is released during calculation, so other Python threads can continue with
+    their work. This tends to have minimal impact on multi-threaded methods, since all
+    the threads are working already; but this could provide better utilisation for
+    single threaded methods.
 
 .. seealso::
     While this function behaves like a function, it is implemented through
@@ -121,6 +149,29 @@ Returns
 -------
 int
     Number of prime numbers up to and including ``num``.
+
+
+Examples
+--------
+Count all the primes up to 10^8 using various methods::
+
+    >>> from rust_primes import SieveMethod, count_primes
+    >>> count_primes(10**8) # defaults to multi-threaded atomic sieving
+    5761455
+    >>> # Let's time it
+    ... _result = count_primes.timed(10**8)
+    >>> _result.result
+    5761455
+    >>> _result.duration # doctest: +SKIP
+    0.3992588689998229
+    >>> count_primes(10**8, method=SieveMethod.ATKIN) # use Atkin's sieve
+    5761455
+    >>> # Let's compare it to multi-threaded atomic sieving
+    ... _result.result
+    5761455
+    >>> _result.duration # doctest: +SKIP
+    0.8057689609995577
+
 """
 
 upper_bound_of_nth_prime = decorators.TimedFunction(bin.upper_bound_of_nth_prime)
@@ -155,6 +206,12 @@ list_n_primes = decorators.TimedFunction(bin.list_n_primes)
 """
 List the first ``n`` primes.
 
+.. note::
+    The GIL is released during calculation, so other Python threads can continue with
+    their work. This tends to have minimal impact on multi-threaded methods, since all
+    the threads are working already; but this could provide better utilisation for
+    single threaded methods.
+
 .. seealso::
     While this function behaves like a function, it is implemented through
     :class:`~rust_primes.decorators.timed.TimedFunction` and thus contains additional
@@ -180,6 +237,12 @@ List[int]
 nth_prime = decorators.TimedFunction(bin.nth_prime)
 """
 Find the ``n``-th prime.
+
+.. note::
+    The GIL is released during calculation, so other Python threads can continue with
+    their work. This tends to have minimal impact on multi-threaded methods, since all
+    the threads are working already; but this could provide better utilisation for
+    single threaded methods.
 
 .. seealso::
     While this function behaves like a function, it is implemented through
