@@ -393,6 +393,13 @@ rest of the (larger) numbers.</p></li>
 <dd><p>Check if the given number is prime.</p>
 <p>This function checks if a given number is a prime number, and returns a <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>
 indicating the result.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The GIL is released during calculation, so other Python threads can continue with
+their work. This tends to have minimal impact on multi-threaded methods, since all
+the threads are working already; but this could provide better utilisation for
+single threaded methods.</p>
+</div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p>While this function behaves like a function, it is implemented through
@@ -425,6 +432,13 @@ functionalities with caching and
 Rust and Python, this function will be somewhat slower than the
 <a class="reference internal" href="#rust_primes.count_primes" title="rust_primes.count_primes"><code class="xref py py-func docutils literal notranslate"><span class="pre">count_primes()</span></code></a> implementation. If you intend to <code class="docutils literal notranslate"><span class="pre">len(list_primes(n))</span></code>,
 use <a class="reference internal" href="#rust_primes.count_primes" title="rust_primes.count_primes"><code class="xref py py-func docutils literal notranslate"><span class="pre">count_primes()</span></code></a> instead.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The GIL is released during calculation, so other Python threads can continue with
+their work. This tends to have minimal impact on multi-threaded methods, since all
+the threads are working already; but this could provide better utilisation for
+single threaded methods.</p>
+</div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p>While this function behaves like a function, it is implemented through
@@ -447,6 +461,15 @@ functionalities with caching and
 <dd class="field-odd"><p>List[int]</p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<p>List all the primes up to 20 using various methods:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rust_primes</span> <span class="kn">import</span> <span class="n">SieveMethod</span><span class="p">,</span> <span class="n">list_primes</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">list_primes</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span> <span class="c1"># defaults to multi-threaded atomic sieving</span>
+<span class="go">[2, 3, 5, 7, 11, 13, 17, 19]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">list_primes</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">SieveMethod</span><span class="o">.</span><span class="n">ATKIN</span><span class="p">)</span> <span class="c1"># use Atkin&#39;s sieve</span>
+<span class="go">[2, 3, 5, 7, 11, 13, 17, 19]</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py data">
@@ -454,6 +477,13 @@ functionalities with caching and
 <span class="sig-prename descclassname"><span class="pre">rust_primes.</span></span><span class="sig-name descname"><span class="pre">count_primes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;rust_primes.decorators.timed.TimedFunction</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#rust_primes.count_primes" title="Permalink to this definition">#</a></dt>
 <dd><p>Count the number of primes numbers less than or equal to <code class="docutils literal notranslate"><span class="pre">num</span></code>.</p>
 <p>The result is given as a <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The GIL is released during calculation, so other Python threads can continue with
+their work. This tends to have minimal impact on multi-threaded methods, since all
+the threads are working already; but this could provide better utilisation for
+single threaded methods.</p>
+</div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p>While this function behaves like a function, it is implemented through
@@ -476,6 +506,26 @@ functionalities with caching and
 <dd class="field-odd"><p>int</p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<p>Count all the primes up to 10^8 using various methods:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rust_primes</span> <span class="kn">import</span> <span class="n">SieveMethod</span><span class="p">,</span> <span class="n">count_primes</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">count_primes</span><span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="mi">8</span><span class="p">)</span> <span class="c1"># defaults to multi-threaded atomic sieving</span>
+<span class="go">5761455</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Let&#39;s time it</span>
+<span class="gp">... </span><span class="n">_result</span> <span class="o">=</span> <span class="n">count_primes</span><span class="o">.</span><span class="n">timed</span><span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="mi">8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_result</span><span class="o">.</span><span class="n">result</span>
+<span class="go">5761455</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_result</span><span class="o">.</span><span class="n">duration</span> 
+<span class="go">0.3992588689998229</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">count_primes</span><span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="mi">8</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">SieveMethod</span><span class="o">.</span><span class="n">ATKIN</span><span class="p">)</span> <span class="c1"># use Atkin&#39;s sieve</span>
+<span class="go">5761455</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Let&#39;s compare it to multi-threaded atomic sieving</span>
+<span class="gp">... </span><span class="n">_result</span><span class="o">.</span><span class="n">result</span>
+<span class="go">5761455</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_result</span><span class="o">.</span><span class="n">duration</span> 
+<span class="go">0.8057689609995577</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py data">
@@ -512,6 +562,13 @@ functionalities with caching and
 <dt class="sig sig-object py" id="rust_primes.list_n_primes">
 <span class="sig-prename descclassname"><span class="pre">rust_primes.</span></span><span class="sig-name descname"><span class="pre">list_n_primes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;rust_primes.decorators.timed.TimedFunction</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#rust_primes.list_n_primes" title="Permalink to this definition">#</a></dt>
 <dd><p>List the first <code class="docutils literal notranslate"><span class="pre">n</span></code> primes.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The GIL is released during calculation, so other Python threads can continue with
+their work. This tends to have minimal impact on multi-threaded methods, since all
+the threads are working already; but this could provide better utilisation for
+single threaded methods.</p>
+</div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p>While this function behaves like a function, it is implemented through
@@ -540,6 +597,13 @@ functionalities with caching and
 <dt class="sig sig-object py" id="rust_primes.nth_prime">
 <span class="sig-prename descclassname"><span class="pre">rust_primes.</span></span><span class="sig-name descname"><span class="pre">nth_prime</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;rust_primes.decorators.timed.TimedFunction</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#rust_primes.nth_prime" title="Permalink to this definition">#</a></dt>
 <dd><p>Find the <code class="docutils literal notranslate"><span class="pre">n</span></code>-th prime.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The GIL is released during calculation, so other Python threads can continue with
+their work. This tends to have minimal impact on multi-threaded methods, since all
+the threads are working already; but this could provide better utilisation for
+single threaded methods.</p>
+</div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p>While this function behaves like a function, it is implemented through

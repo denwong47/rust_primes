@@ -407,34 +407,34 @@ behaviours:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">rust_primes</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Normal function call</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">rust_primes</span><span class="o">.</span><span class="n">count_primes</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
-<span class="gp">... </span><span class="mi">168</span>
+<span class="gp">... </span><span class="n">rust_primes</span><span class="o">.</span><span class="n">count_primes</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+<span class="go">168</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># If we make the same call again, the answer is cached this time</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">rust_primes</span><span class="o">.</span><span class="n">count_primes</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
-<span class="gp">... </span><span class="mi">168</span>
+<span class="gp">... </span><span class="n">rust_primes</span><span class="o">.</span><span class="n">count_primes</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+<span class="go">168</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Timed function call</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># While it does not look like it, the actual returned value is a TimedResult</span>
-<span class="gp">... </span>  <span class="nb">object</span><span class="o">.</span> <span class="n">It</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">subclass</span> <span class="n">of</span> <span class="nb">float</span> <span class="n">which</span> <span class="ow">is</span> <span class="n">what</span> <span class="ow">is</span> <span class="n">displayed</span> <span class="n">here</span><span class="p">,</span>
-<span class="gp">... </span>  <span class="n">but</span> <span class="n">it</span> <span class="n">also</span> <span class="n">contains</span> <span class="n">the</span> <span class="k">return</span> <span class="n">value</span> <span class="n">etc</span><span class="o">.</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># All parameters will be passed through to the underlying function.</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">_result</span> <span class="o">=</span> <span class="n">rust_primes</span><span class="o">.</span><span class="n">count_primes</span><span class="o">.</span><span class="n">timed</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">_result</span>
-<span class="gp">... </span><span class="mf">1.360991392284632e-06</span>
+<span class="gp">... </span><span class="c1"># While it does not look like it, the actual returned value is a TimedResult</span>
+<span class="gp">... </span><span class="c1"># object. It is a subclass of float which is what is displayed here,</span>
+<span class="gp">... </span><span class="c1"># but it also contains the return value etc.</span>
+<span class="gp">... </span><span class="c1"># All parameters will be passed through to the underlying function.</span>
+<span class="gp">... </span><span class="n">_result</span> <span class="o">=</span> <span class="n">rust_primes</span><span class="o">.</span><span class="n">count_primes</span><span class="o">.</span><span class="n">timed</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_result</span> 
+<span class="go">1.360991392284632e-06</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">_result</span><span class="o">.</span><span class="n">result</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="mi">168</span>
+<span class="go">168</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Additional parameters</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># `number` can be specified to state how many times the exeuction should be</span>
-<span class="gp">... </span>  <span class="n">run</span> <span class="ow">and</span> <span class="n">timed</span><span class="o">.</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">_result</span> <span class="o">=</span> <span class="n">rust_primes</span><span class="o">.</span><span class="n">count_primes</span><span class="o">.</span><span class="n">timed</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="gp">... </span><span class="mf">0.0016299039998557419</span>
+<span class="gp">... </span><span class="c1"># `number` can be specified to state how many times the exeuction should be</span>
+<span class="gp">... </span><span class="c1"># run and timed.</span>
+<span class="gp">... </span><span class="n">_result</span> <span class="o">=</span> <span class="n">rust_primes</span><span class="o">.</span><span class="n">count_primes</span><span class="o">.</span><span class="n">timed</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span> 
+<span class="go">0.0016299039998557419</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Average run time</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">_result</span><span class="o">.</span><span class="n">avg</span>
-<span class="gp">... </span><span class="mf">1.461696985643357e-06</span>
+<span class="gp">... </span><span class="n">_result</span><span class="o">.</span><span class="n">avg</span> 
+<span class="go">1.461696985643357e-06</span>
 </pre></div>
 </div>
 <dl class="py method">

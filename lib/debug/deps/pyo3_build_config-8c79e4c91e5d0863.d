@@ -1,0 +1,13 @@
+/home/runner/work/rust_primes/rust_primes/docs/build/html/lib/debug/deps/pyo3_build_config-8c79e4c91e5d0863.rmeta: /home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pyo3-build-config-0.17.3/src/lib.rs /home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pyo3-build-config-0.17.3/src/errors.rs /home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pyo3-build-config-0.17.3/src/impl_.rs /home/runner/work/rust_primes/rust_primes/docs/build/html/lib/debug/build/pyo3-build-config-961e5c9de4016ade/out/pyo3-build-config-file.txt /home/runner/work/rust_primes/rust_primes/docs/build/html/lib/debug/build/pyo3-build-config-961e5c9de4016ade/out/pyo3-build-config.txt
+
+/home/runner/work/rust_primes/rust_primes/docs/build/html/lib/debug/deps/libpyo3_build_config-8c79e4c91e5d0863.rlib: /home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pyo3-build-config-0.17.3/src/lib.rs /home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pyo3-build-config-0.17.3/src/errors.rs /home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pyo3-build-config-0.17.3/src/impl_.rs /home/runner/work/rust_primes/rust_primes/docs/build/html/lib/debug/build/pyo3-build-config-961e5c9de4016ade/out/pyo3-build-config-file.txt /home/runner/work/rust_primes/rust_primes/docs/build/html/lib/debug/build/pyo3-build-config-961e5c9de4016ade/out/pyo3-build-config.txt
+
+/home/runner/work/rust_primes/rust_primes/docs/build/html/lib/debug/deps/pyo3_build_config-8c79e4c91e5d0863.d: /home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pyo3-build-config-0.17.3/src/lib.rs /home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pyo3-build-config-0.17.3/src/errors.rs /home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pyo3-build-config-0.17.3/src/impl_.rs /home/runner/work/rust_primes/rust_primes/docs/build/html/lib/debug/build/pyo3-build-config-961e5c9de4016ade/out/pyo3-build-config-file.txt /home/runner/work/rust_primes/rust_primes/docs/build/html/lib/debug/build/pyo3-build-config-961e5c9de4016ade/out/pyo3-build-config.txt
+
+/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pyo3-build-config-0.17.3/src/lib.rs:
+/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pyo3-build-config-0.17.3/src/errors.rs:
+/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pyo3-build-config-0.17.3/src/impl_.rs:
+/home/runner/work/rust_primes/rust_primes/docs/build/html/lib/debug/build/pyo3-build-config-961e5c9de4016ade/out/pyo3-build-config-file.txt:
+/home/runner/work/rust_primes/rust_primes/docs/build/html/lib/debug/build/pyo3-build-config-961e5c9de4016ade/out/pyo3-build-config.txt:
+
+# env-dep:OUT_DIR=/home/runner/work/rust_primes/rust_primes/docs/build/html/lib/debug/build/pyo3-build-config-961e5c9de4016ade/out
